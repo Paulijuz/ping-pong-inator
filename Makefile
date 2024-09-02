@@ -1,5 +1,5 @@
 # List all source files to be compiled; separate with space
-SOURCE_FILES := src/main.c src/drivers/uart.c
+SOURCE_FILES := $(patsubst src/%, %, $(shell find "src" -name '*.c'))
 C_INCLUDES := -Iinc
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
@@ -23,10 +23,11 @@ OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
 .DEFAULT_GOAL := $(BUILD_DIR)/main.hex
 
 $(BUILD_DIR):
-	mkdir $(BUILD_DIR)
+	@mkdir $(BUILD_DIR)
 
-$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.o: src/%.c | $(BUILD_DIR)
+	@mkdir -p $(@D)
+	$(CC) -Wall $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/main.hex: $(OBJECT_FILES) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(OBJECT_FILES) -o $(BUILD_DIR)/a.out
