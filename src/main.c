@@ -9,19 +9,25 @@
  *
  */
 
-#define F_CPU 4915200
-
+#include "defines.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include "drivers/uart.h"
 
 int main(void) {
-    DDRB = 0xff;
+    DDRB       = 0xff;
+    int status = 1;
+    PORTB      = status;
+
+    uart_init(9600);
 
     while (1) {
-        PORTB = 0xff;
-        _delay_ms(500);
-        PORTB = 0x00;
-        _delay_ms(500);
+        char data = uart_receive_char();
+        if (data == 'e') {
+            PORTB  = status;
+            status = !status;
+        }
+        uart_transmit_char(data);
     }
 
     return 0;
