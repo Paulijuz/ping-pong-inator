@@ -1,0 +1,33 @@
+---
+Language: Cpp # Also covers at least C, ObjC, ObjC++
+
+# Default style
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 0
+
+# Trailing comments
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 1
+
+# Consecutive stuff
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossEmptyLines: true
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Left
+ContinuationIndentWidth: 2
+
+# Includes
+SortIncludes: false
+
+# [cpp]
+PackConstructorInitializers: Never
+BreakConstructorInitializers: BeforeComma
+---
