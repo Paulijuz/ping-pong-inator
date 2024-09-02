@@ -1,5 +1,6 @@
 # List all source files to be compiled; separate with space
-SOURCE_FILES := src/*
+SOURCE_FILES := src/main.c src/drivers/uart.c
+C_INCLUDES := -Iinc
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
@@ -15,7 +16,7 @@ TARGET_CPU := atmega162
 TARGET_DEVICE := m162
 
 CC := avr-gcc
-CFLAGS := -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
+CFLAGS := $(C_INCLUDES) -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
 
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
 
