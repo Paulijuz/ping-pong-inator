@@ -4,14 +4,14 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/avr/include/**"
+                "/usr/lib/avr/include/**"
             ],
             "defines": [
                 "__AVR_ATmega162__"
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "linux-clang-x64",
+            "intelliSenseMode": "linux-clang-x64"
         }
     ],
     "version": 4
