@@ -9,6 +9,7 @@
  *
  */
 
+#include "drivers/uart.h"
 #include "defines.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -38,14 +39,15 @@ void uart_init(unsigned int baud_rate) {
              (3 << UCSZ00);  // Set number of data bits to 8.
 
 
-    fdevopen(uart_transmit_char, NULL);
+    fdevopen(&uart_transmit_char_file, NULL);
 }
+
 /**
  * @brief Transmits a single char over uart 0.
  *
  * @param data
  */
-int uart_transmit_char(unsigned char data, FILE *file) {
+int uart_transmit_char(char data) {
     // Wait for transmit buffer to be empty.
     // We do this by checking wheter or not the data
     // register empty flag (UDRE0) in uart control and
@@ -57,6 +59,10 @@ int uart_transmit_char(unsigned char data, FILE *file) {
     UDR0 = data;
 
     return 0;
+}
+
+int uart_transmit_char_file(char data, FILE *file) {
+    return uart_transmit_char(data);
 }
 
 char uart_receive_char() {

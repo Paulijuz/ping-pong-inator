@@ -27,7 +27,7 @@ int main(void) {
             PORTB  = status;
             status = !status;
         }
-        uart_transmit_char(data);
+        printf("%c", data);
     }
 
     return 0;

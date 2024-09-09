@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/lib/avr/include/**"
+                "/usr/avr/include/**"
             ],
             "defines": [
                 "__AVR_ATmega162__"
