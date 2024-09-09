@@ -12,6 +12,7 @@
 #include "defines.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
 
 /**
  * Initalizes usart 0.
@@ -35,13 +36,16 @@ void uart_init(unsigned int baud_rate) {
     UCSR0C = (1 << URSEL0) | // Enable read/write for UCSRC and disable read/write for UBRRH.
              (1 << USBS0) |  // Set number of stop bits to 2.
              (3 << UCSZ00);  // Set number of data bits to 8.
+
+
+    fdevopen(uart_transmit_char, NULL);
 }
 /**
  * @brief Transmits a single char over uart 0.
  *
  * @param data
  */
-void uart_transmit_char(unsigned char data) {
+int uart_transmit_char(unsigned char data, FILE *file) {
     // Wait for transmit buffer to be empty.
     // We do this by checking wheter or not the data
     // register empty flag (UDRE0) in uart control and
@@ -51,6 +55,8 @@ void uart_transmit_char(unsigned char data) {
 
     // Set transmit register to data.
     UDR0 = data;
+
+    return 0;
 }
 
 char uart_receive_char() {
@@ -61,3 +67,5 @@ char uart_receive_char() {
     // Read recieved data.
     return UDR0;
 }
+
+
