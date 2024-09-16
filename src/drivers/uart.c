@@ -38,8 +38,7 @@ void uart_init(unsigned int baud_rate) {
              (1 << USBS0) |  // Set number of stop bits to 2.
              (3 << UCSZ00);  // Set number of data bits to 8.
 
-
-    fdevopen(&uart_transmit_char_file, NULL);
+    fdevopen(uart_transmit_char_file, NULL);
 }
 
 /**
