@@ -10,25 +10,44 @@
  */
 
 #include "defines.h"
+#include "drivers/uart.h"
+#include "sram_test.h"
 #include <avr/io.h>
 #include <util/delay.h>
-#include "drivers/uart.h"
 
 int main(void) {
-    DDRB       = 0xff;
-    int status = 1;
-    PORTB      = status;
+    // DDRB       = 0xff;
+    // int status = 1;
+    // PORTB      = status;
+
+    MCUCR |= 1 << SRE;
 
     uart_init(9600);
 
+    // while (1) {
+    //     SRAM_test();
+    //     _delay_ms(10000);
+    // }
+
     while (1) {
-        char data = uart_receive_char();
-        if (data == 'e') {
-            PORTB  = status;
-            status = !status;
+        for (int i = 0x1400; i<=0x1744; i++) {
+            *(int *)i = 0xFF;
+            _delay_ms(1);
         }
-        printf("%c", data);
+        for (int i = 0x1800; i<=0x1FFF; i++) {
+            *(int *)i = 0xFF;
+            _delay_ms(1);
+        }
     }
+
+    // while (1) {
+    //     char data = uart_receive_char();
+    //     if (data == 'e') {
+    //         PORTB  = status;
+    //         status = !status;
+    //     }
+    //     printf("%c", data);
+    // }
 
     return 0;
 }
