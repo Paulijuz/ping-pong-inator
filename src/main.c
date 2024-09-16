@@ -72,25 +72,26 @@ int main(void) {
         // CS test
         // adc_cs();
         // _delay_ms(10);
-        volatile uint16_t joystick;
-        volatile uint16_t slider;
-        adc_read(&joystick, &slider);
+        volatile uint32_t adc_output = adc_read();
+
+        volatile uint16_t joystick = adc_output;
+        volatile uint16_t slider = adc_output >> 2*8;
 
         volatile uint8_t joystick_x = joystick & 0xFF;
         volatile uint8_t joystick_y = (joystick >> 8) & 0xFF;
-        printf("Hello, World %d!\r\n", 14);
+        // printf("Hello, World %d!\r\n", 14);
         // if (printf("Joystick: %d %d\r\n", 14, 41) < 0) {
         //     printf("FAIL\r\n");
         // }
         // printf("Joystick: %d %d\r\n", joystick_x, joystick_y);
         // printf("Joystick: %u", joystick_x);
         // printf(" %u\r\n", joystick_y);
-        // printf("Joystick: %u, %u\r\n", joystick_x, joystick_y);
+        printf("Joystick: %u, %u", joystick_x, joystick_y);
         // fflush(stdout);
 
-        // volatile uint8_t slider_x = slider & 0xFF;
-        // volatile uint8_t slider_y = (slider >> 8) & 0xFF;
-        // printf(", slider: %3u, %3u\r\n", slider_x, slider_y);
+        volatile uint8_t slider_x = slider & 0xFF;
+        volatile uint8_t slider_y = (slider >> 8) & 0xFF;
+        printf(", slider: %3u, %3u\r\n", slider_x, slider_y);
         // printf("Slider: %s\r\n", "Hei!");
 
         // if (PORTB & 1) {

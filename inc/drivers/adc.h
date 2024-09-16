@@ -6,4 +6,4 @@
 
 // void adc_init();
 void adc_init();
-void adc_read(uint16_t *low, uint16_t *high);
+uint32_t adc_read();

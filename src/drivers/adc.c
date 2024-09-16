@@ -33,16 +33,16 @@ void adc_init() {
  *
  * @return uint16_t. X-axis as the upper 8 bits, and Y-axis as lower 8 bits.
  */
-void adc_read(uint16_t *low, uint16_t *high) {
+uint32_t adc_read() {
     // Write to base (prevents double write for 16 bit address)
     volatile uint8_t *base = (uint8_t *)0x1400;
     *base                  = 0xFF;
     _delay_us(4);
 
     // Read from full (reads both x and y from ADC)
-    volatile uint16_t *full = (uint16_t *)0x1400;
-    *low                    = *full;
-    *high                   = *full;
+    volatile uint32_t *full = (uint32_t *)0x1400;
+    return *full;
+    // *high                   = *full;
     // volatile int16_t output_x = output & 0xFF;
     // volatile int16_t output_y = (output >> 8) & 0xFF;
 }
