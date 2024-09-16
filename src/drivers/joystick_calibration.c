@@ -11,87 +11,122 @@
 
 #include "drivers/joystick_calibration.h"
 
-#define CALIBRATION_DELAY 4000
+// clang-format off
+typedef enum JOYSTICK_DIR {
+    JOYSTICK_CENTER,
+    JOYSTICK_TOP,
+    JOYSTICK_BOTTOM,
+    JOYSTICK_RIGHT,
+    JOYSTICK_LEFT
+} e_JOYSTICK_DIR;
+// clang-format on
+
+#define CALIBRATION_DELAY 1500
+
+void calibrate_axis(e_JOYSTICK_DIR axis, joystick_t *config) {
+    const char *axis_names[5];
+    axis_names[JOYSTICK_CENTER] = "center";
+    axis_names[JOYSTICK_TOP]    = "top";
+    axis_names[JOYSTICK_BOTTOM] = "bottom";
+    axis_names[JOYSTICK_RIGHT]  = "right";
+    axis_names[JOYSTICK_LEFT]   = "left";
+
+    printf("Move to %s", axis_names[axis]);
+    _delay_ms(CALIBRATION_DELAY);
+    printf("Calibrating...\r\n");
+    uint8_t calx = 0;
+    uint8_t caly = 0;
+    for (int i = 0; i < 100; ++i) {
+        uint16_t joystick = adc_read();
+        calx += joystick & 0xFF;
+        caly += (joystick >> 8) & 0xFF;
+        _delay_ms(10);
+    }
+    calx /= 100;
+    caly /= 100;
+
+    if (axis == JOYSTICK_CENTER) {
+        config->x_off = calx;
+        config->y_off = caly;
+    } else if (axis == JOYSTICK_TOP) {
+        config->y_max = caly;
+    } else if (axis == JOYSTICK_BOTTOM) {
+        config->y_min = caly;
+    } else if (axis == JOYSTICK_RIGHT) {
+        config->x_max = calx;
+    } else if (axis == JOYSTICK_LEFT) {
+        config->x_min = calx;
+    }
+}
 
 void calibrate(joystick_t *config) {
-    printf("\r\n--- Initiating joystick calibration ---\r\n");
+    printf("\r\n--- Joystick calibration ---\r\n");
     uint16_t calx = 0;
     uint16_t caly = 0;
-    // char    *progress_bar = "##########";
-    uint16_t output;
+    uint16_t joystick;
 
     // Center calibration
-    printf("Move joystick to center position\r\n");
+    printf("Move to center\r\n");
     _delay_ms(CALIBRATION_DELAY);
-    printf("Calibrating center position...\r\n");
+    printf("Calibrating...\r\n");
     calx = 0;
     caly = 0;
     for (int i = 0; i < 100; ++i) {
-        output = adc_read();
-        calx += output & 0xFF;
-        caly += (output >> 8) & 0xFF;
-        // printf("Calibrating | %.*s | %03d%%", 10, progress_bar, 0);
+        joystick = adc_read();
+        calx += joystick & 0xFF;
+        caly += (joystick >> 8) & 0xFF;
         _delay_ms(10);
     }
     config->x_off = calx / 100;
     config->y_off = caly / 100;
-    printf("Center calibration complete: X: %03u, Y: %03u\r\n", config->x_off, config->y_off);
 
     // Top calibration
-    printf("Move joystick to top position\r\n");
+    printf("Move to top\r\n");
     _delay_ms(CALIBRATION_DELAY);
-    printf("Calibrating top position...\r\n");
+    printf("Calibrating...\r\n");
     caly = 0;
     for (int i = 0; i < 100; ++i) {
-        output = adc_read();
-        caly += (output >> 8) & 0xFF;
-        // printf("Calibrating | %.*s | %03d%%", 10, progress_bar, 0);
+        joystick = adc_read();
+        caly += (joystick >> 8) & 0xFF;
         _delay_ms(10);
     }
     config->y_max = caly / 100;
-    printf("Top calibration complete: Y: %03u\r\n", config->y_max);
 
     // Bottom calibration
-    printf("Move joystick to bottom position\r\n");
+    printf("Move to bottom\r\n");
     _delay_ms(CALIBRATION_DELAY);
-    printf("Calibrating bottom position...\r\n");
+    printf("Calibrating...\r\n");
     caly = 0;
     for (int i = 0; i < 100; ++i) {
-        output = adc_read();
-        caly += (output >> 8) & 0xFF;
-        // printf("Calibrating | %.*s | %03d%%", 10, progress_bar, 0);
+        joystick = adc_read();
+        caly += (joystick >> 8) & 0xFF;
         _delay_ms(10);
     }
     config->y_min = caly / 100;
-    printf("Bottom calibration complete: Y: %03u\r\n", config->y_min);
 
     // Right calibration
-    printf("Move joystick to right position\r\n");
+    printf("Move to right\r\n");
     _delay_ms(CALIBRATION_DELAY);
-    printf("Calibrating right position...\r\n");
+    printf("Calibrating...\r\n");
     calx = 0;
     for (int i = 0; i < 100; ++i) {
-        output = adc_read();
-        calx += output & 0xFF;
-        // printf("Calibrating | %.*s | %03d%%", 10, progress_bar, 0);
+        joystick = adc_read();
+        calx += joystick & 0xFF;
         _delay_ms(10);
     }
-    config->x_max = caly / 100;
-    printf("Right calibration complete: X: %03u\r\n", config->x_max);
+    config->x_max = calx / 100;
 
     // Left calibration
-    printf("Move joystick to left position\r\n");
+    printf("Move to left\r\n");
     _delay_ms(CALIBRATION_DELAY);
-    printf("Calibrating left position...\r\n");
+    printf("Calibrating...\r\n");
     calx = 0;
     for (int i = 0; i < 100; ++i) {
-        output = adc_read();
-        calx += output & 0xFF;
-        // printf("Calibrating | %.*s | %03d%%", 10, progress_bar, 0);
+        joystick = adc_read();
+        calx += joystick & 0xFF;
         _delay_ms(10);
     }
-    config->x_min = caly / 100;
-    printf("Left calibration complete: X: %03u\r\n", config->x_min);
+    config->x_min = calx / 100;
 
     // Check if max and min are swapped
     if (config->x_max < config->x_min) {
@@ -105,7 +140,7 @@ void calibrate(joystick_t *config) {
         config->y_min = temp;
     }
 
-    printf("\r\n--- Joystick calibration complete ---\r\n");
+    printf("\r\n--- Calibration complete ---\r\n");
     printf("Joystick X: %u/%u/%u\r\n", config->x_min, config->x_off, config->x_max);
     printf("Joystick Y: %u/%u/%u\r\n", config->y_min, config->y_off, config->y_max);
     _delay_ms(CALIBRATION_DELAY);
@@ -119,12 +154,15 @@ void calibrate(joystick_t *config) {
  * @param config
  * @return uint8_t
  */
-uint8_t joy_x(uint8_t adc_val, joystick_t *config) {
-    // int16_t xval = adc_val + (config->x_off - 128);
-    // int16_t xval = min(max(adc_val, config->x_min), config->x_max);
-    int16_t xval = adc_val;
+int8_t joy_x(uint8_t adc_val, joystick_t *config) {
+    // int8_t xval = adc_val + (config->x_off - 128);
+    // int8_t xval = min(max(adc_val, config->x_min), config->x_max);
+    int8_t xval = adc_val;
     if (xval < config->x_min) {
         xval = config->x_min;
+    }
+    if (xval > config->x_max) {
+        xval = config->x_max;
     }
 
     if (xval < config->x_off) {
@@ -141,10 +179,16 @@ uint8_t joy_x(uint8_t adc_val, joystick_t *config) {
  * @param config
  * @return uint8_t
  */
-uint8_t joy_y(uint8_t adc_val, joystick_t *config) {
-    // int16_t xval = adc_val + (config->x_off - 128);
-    // int16_t yval = min(max(adc_val, config->y_min), config->y_max);
-    int16_t yval = adc_val;
+int8_t joy_y(uint8_t adc_val, joystick_t *config) {
+    // int8_t xval = adc_val + (config->x_off - 128);
+    // int8_t yval = min(max(adc_val, config->y_min), config->y_max);
+    int8_t yval = adc_val;
+    if (yval < config->y_min) {
+        yval = config->y_min;
+    }
+    if (yval > config->y_max) {
+        yval = config->y_max;
+    }
     if (yval < config->y_off) {
         return mapint(yval, config->y_min, config->y_off, JOY_MIN, JOY_CENTER);
     } else {
@@ -152,6 +196,6 @@ uint8_t joy_y(uint8_t adc_val, joystick_t *config) {
     }
 }
 
-int16_t mapint(int16_t val, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max) {
+int8_t mapint(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max) {
     return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

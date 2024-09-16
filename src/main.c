@@ -49,14 +49,14 @@ int main(void) {
     adc_init();
     printf("ADC initialized\r\n");
     // _delay_ms(1000);
-    // joystick_t calibration_config;
-    // calibration_config.calibrated = false;
+    joystick_t calibration_config;
+    calibration_config.calibrated = false;
 
     while (1) {
         // printf("Hello, World!\r\n");
-        // if (!calibration_config.calibrated) {
-        //     calibrate(&calibration_config);
-        // }
+        if (!calibration_config.calibrated) {
+            calibrate(&calibration_config);
+        }
         // counter = !counter;
         // if (counter) {
         //     PORTD |= (1 << 5);
@@ -86,12 +86,12 @@ int main(void) {
         // printf("Joystick: %d %d\r\n", joystick_x, joystick_y);
         // printf("Joystick: %u", joystick_x);
         // printf(" %u\r\n", joystick_y);
-        printf("Joystick: %u, %u", joystick_x, joystick_y);
+        // printf("Joystick: %u, %u", joystick_x, joystick_y);
         // fflush(stdout);
 
-        volatile uint8_t slider_x = slider & 0xFF;
-        volatile uint8_t slider_y = (slider >> 8) & 0xFF;
-        printf(", slider: %3u, %3u\r\n", slider_x, slider_y);
+        // volatile uint8_t slider_x = slider & 0xFF;
+        // volatile uint8_t slider_y = (slider >> 8) & 0xFF;
+        // printf(", slider: %3u, %3u\r\n", slider_x, slider_y);
         // printf("Slider: %s\r\n", "Hei!");
 
         // if (PORTB & 1) {
@@ -101,9 +101,9 @@ int main(void) {
         //     printf("Button 2 pressed\r\n");
         // }
 
-        // int8_t joyx = joy_x(output_x, &calibration_config);
-        // int8_t joyy = joy_y(output_y, &calibration_config);
-        // printf("Joystick output: %03d, %03d\r\n", joyx, joyy);
+        int8_t joyx = joy_x(joystick_x, &calibration_config);
+        int8_t joyy = joy_y(joystick_y, &calibration_config);
+        printf("Joystick: %03d, %03d | %03d, %03d\r\n", joyx, joyy, joystick_x, joystick_y);
 
         // Write signal
         // Wait

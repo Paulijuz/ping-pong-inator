@@ -35,7 +35,7 @@ typedef struct joystick_s {
 } joystick_t;
 
 void    calibrate(joystick_t *config);
-uint8_t joy_x(uint8_t adc_val, joystick_t *config);
-uint8_t joy_y(uint8_t adc_val, joystick_t *config);
+int8_t  joy_x(uint8_t adc_val, joystick_t *config);
+int8_t  joy_y(uint8_t adc_val, joystick_t *config);
 
-int16_t mapint(int16_t val, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max);
+int8_t  mapint(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max);
