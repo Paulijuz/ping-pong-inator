@@ -1,17 +1,39 @@
 {
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}/**"
+        ],
+        "myDefines": [
+            "__AVR_ATmega162__"
+        ]
+    },
     "configurations": [
         {
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/avr/include/**"
+                "/usr/avr/include/**",
+                "/usr/lib/avr/include/**"
             ],
             "defines": [
-                "__AVR_ATmega162__"
+                "${myDefines}"
             ],
             "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-clang-x64"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "${myDefaultIncludePath}",
+                "/opt/homebrew/Cellar/avr-gcc@14/14.1.0/avr/include/**"
+            ],
+            "defines": [
+                "${myDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-x64"
         }
     ],
     "version": 4
