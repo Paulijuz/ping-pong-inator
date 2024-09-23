@@ -114,21 +114,9 @@ void joystick_calibrate(joystick_config_t *config) {
  * @return joystick_t
  */
 joystick_t joystick_read(joystick_config_t *config) {
-    // uint32_t   adc_output     = adc_read() >> (2 * 8);
-    // uint16_t   joystick_raw   = adc_output & 0xFFFF;
-    // uint8_t    joystick_raw_x = joystick_raw & 0xFF;
-    // uint8_t    joystick_raw_y = (joystick_raw >> 8) & 0xFF;
     joystick_t position = joystick_read_raw();
     position.x          = joystick_adjust(position.raw_x, config->x_config);
     position.y          = joystick_adjust(position.raw_y, config->y_config);
-
-    // joystick_t position = {
-    //   joystick_adjust(joystick_raw_x, config->x_config),
-    //   joystick_adjust(joystick_raw_y, config->y_config),
-
-    //   joystick_raw_x,
-    //   joystick_raw_y,
-    // };
     return position;
 }
 
@@ -139,16 +127,12 @@ joystick_t joystick_read(joystick_config_t *config) {
  */
 joystick_t joystick_read_raw(void) {
     uint32_t   adc_output     = adc_read() >> (2 * 8);
-    uint16_t   joystick_raw   = adc_output & 0xFFFF;
-    uint8_t    joystick_raw_x = joystick_raw & 0xFF;
-    uint8_t    joystick_raw_y = (joystick_raw >> 8) & 0xFF;
-
+    // uint16_t   joystick_raw   = adc_output & 0xFFFF;
     joystick_t position = {
-      0,
-      0,
-
-      joystick_raw_x,
-      joystick_raw_y,
+      .x     = 0,
+      .y     = 0,
+      .raw_x = adc_output & 0xFF,
+      .raw_y = (adc_output >> 8) & 0xFF,
     };
     return position;
 }
@@ -168,9 +152,9 @@ int8_t joystick_adjust(uint8_t value, joystick_config_axis_t axis_config) {
         value = axis_config.max;
     }
     if (value < axis_config.center) {
-        return map_int(value, axis_config.min, axis_config.center, JOY_MIN, JOY_CENTER);
+        return map_int8(value, axis_config.min, axis_config.center, JOY_MIN, JOY_CENTER);
     } else {
-        return map_int(value, axis_config.center, axis_config.max, JOY_CENTER, JOY_MAX);
+        return map_int8(value, axis_config.center, axis_config.max, JOY_CENTER, JOY_MAX);
     }
 }
 
@@ -184,6 +168,6 @@ int8_t joystick_adjust(uint8_t value, joystick_config_axis_t axis_config) {
  * @param out_max
  * @return int8_t
  */
-int8_t map_int(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max) {
+int8_t map_int8(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max) {
     return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

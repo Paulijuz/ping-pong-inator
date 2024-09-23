@@ -33,7 +33,7 @@ void adc_init() {
  *
  * @return uint16_t. X-axis as the upper 8 bits, and Y-axis as lower 8 bits.
  */
-uint32_t adc_read() {
+uint32_t adc_read(void) {
     // Write to base (prevents double write for 16 bit address)
     volatile uint8_t *base = (uint8_t *)0x1400;
     *base                  = 0xFF;

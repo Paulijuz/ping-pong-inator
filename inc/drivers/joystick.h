@@ -87,6 +87,6 @@ joystick_t joystick_read(joystick_config_t *config);
 joystick_t joystick_read_raw(void);
 int8_t     joystick_adjust(uint8_t value, joystick_config_axis_t axis_config);
 
-int8_t     map_int(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max);
+int8_t     map_int8(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max);
 
 #endif // JOYSTICK_H
