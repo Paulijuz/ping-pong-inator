@@ -47,7 +47,7 @@ int main(void) {
     }
 
     // Initialize OLED
-    // oled_init();
+    oled_init();
     printf("OLED initialized\r\n");
 
     while (1) {
@@ -62,6 +62,10 @@ int main(void) {
         //     *addr = 0xFF;
         //     printf("Wrote 0xFF to address %p\r\n", addr);
         // }
+
+        // Data test for OLED
+        volatile uint8_t *base = (uint8_t *)0x1200;
+        *base                  = 0xFF;
     }
 
     return 0;
