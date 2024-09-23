@@ -31,6 +31,24 @@
 
 #define CALIBRATION_DELAY 1500 // ms, delay between calibration steps (for human interaction)
 
+typedef enum JOYSTICK_INITIALIZATION_STATE {
+    JOYSTICK_NO_CALIBRATE,
+    JOYSTICK_USE_DEFAULT_CALIBRATION,
+    JOYSTICK_CALIBRATE
+} e_JOYSTICK_INITIALIZATION_STATE;
+
+// clang-format off
+typedef enum JOYSTICK_DIR {
+    JOYSTICK_CENTER,
+    JOYSTICK_TOP,
+    JOYSTICK_BOTTOM,
+    JOYSTICK_RIGHT,
+    JOYSTICK_LEFT,
+
+    JOYSTICK_ENUM_LENGTH,
+} e_JOYSTICK_DIR;
+// clang-format on
+
 /**
  * @brief Struct for joystick calibration configuration
  *
@@ -63,8 +81,10 @@ typedef struct joystick_s {
     uint8_t raw_y;
 } joystick_t;
 
+void       joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE state);
 void       joystick_calibrate(joystick_config_t *config);
 joystick_t joystick_read(joystick_config_t *config);
+joystick_t joystick_read_raw(void);
 int8_t     joystick_adjust(uint8_t value, joystick_config_axis_t axis_config);
 
 int8_t     map_int(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max);

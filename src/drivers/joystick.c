@@ -11,17 +11,27 @@
 
 #include "drivers/joystick.h"
 
-// clang-format off
-typedef enum JOYSTICK_DIR {
-    JOYSTICK_CENTER,
-    JOYSTICK_TOP,
-    JOYSTICK_BOTTOM,
-    JOYSTICK_RIGHT,
-    JOYSTICK_LEFT,
-
-    JOYSTICK_ENUM_LENGTH,
-} e_JOYSTICK_DIR;
-// clang-format on
+/**
+ * @brief Initialize joystick configuration
+ *
+ * @param config
+ * @param state
+ */
+void joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE state) {
+    switch (state) {
+    case JOYSTICK_NO_CALIBRATE:
+        config->calibrated = true;
+        break;
+    case JOYSTICK_USE_DEFAULT_CALIBRATION:
+        config->x_config   = (joystick_config_axis_t){2, 158, 254};
+        config->y_config   = (joystick_config_axis_t){2, 164, 254};
+        config->calibrated = true;
+        break;
+    case JOYSTICK_CALIBRATE:
+        config->calibrated = false;
+        break;
+    }
+}
 
 /**
  * @brief Prompt user for single joystick direction calibration
@@ -43,9 +53,9 @@ void joystick_calibrate_axis(e_JOYSTICK_DIR axis, joystick_config_t *config) {
     uint8_t calx = 0;
     uint8_t caly = 0;
     for (int i = 0; i < 100; ++i) {
-        uint16_t joystick = adc_read();
-        calx += joystick & 0xFF;
-        caly += (joystick >> 8) & 0xFF;
+        joystick_t joystick = joystick_read_raw();
+        calx += joystick.raw_x;
+        caly += joystick.raw_y;
         _delay_ms(10);
     }
     calx /= 100;
@@ -104,14 +114,38 @@ void joystick_calibrate(joystick_config_t *config) {
  * @return joystick_t
  */
 joystick_t joystick_read(joystick_config_t *config) {
+    // uint32_t   adc_output     = adc_read() >> (2 * 8);
+    // uint16_t   joystick_raw   = adc_output & 0xFFFF;
+    // uint8_t    joystick_raw_x = joystick_raw & 0xFF;
+    // uint8_t    joystick_raw_y = (joystick_raw >> 8) & 0xFF;
+    joystick_t position = joystick_read_raw();
+    position.x          = joystick_adjust(position.raw_x, config->x_config);
+    position.y          = joystick_adjust(position.raw_y, config->y_config);
+
+    // joystick_t position = {
+    //   joystick_adjust(joystick_raw_x, config->x_config),
+    //   joystick_adjust(joystick_raw_y, config->y_config),
+
+    //   joystick_raw_x,
+    //   joystick_raw_y,
+    // };
+    return position;
+}
+
+/**
+ * @brief Read raw x/y values from joystick
+ *
+ * @return joystick_t
+ */
+joystick_t joystick_read_raw(void) {
     uint32_t   adc_output     = adc_read() >> (2 * 8);
     uint16_t   joystick_raw   = adc_output & 0xFFFF;
     uint8_t    joystick_raw_x = joystick_raw & 0xFF;
     uint8_t    joystick_raw_y = (joystick_raw >> 8) & 0xFF;
 
     joystick_t position = {
-      joystick_adjust(joystick_raw_x, config->x_config),
-      joystick_adjust(joystick_raw_y, config->y_config),
+      0,
+      0,
 
       joystick_raw_x,
       joystick_raw_y,
