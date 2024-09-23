@@ -16,8 +16,15 @@ TARGET_CPU := atmega162
 TARGET_DEVICE := m162
 
 CC := avr-gcc
-CFLAGS := $(C_INCLUDES) -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
-
+CFLAGS := $(C_INCLUDES) # Specify all the include files for the compiler.
+CFLAGS += -O # Enable optimalization.
+CFLAGS += -std=c11 # Specify C version.
+CFLAGS += -mmcu=$(TARGET_CPU) # Target CPU instructions.
+CFLAGS += -ggdb # Tell the compiler to include information for debugging in the final binary file.
+CFLAGS += -ffunction-sections # Move functions into their own sections.
+CFLAGS += -fdata-sections # Move data into their own sections.
+CFLAGS += -Wl,-gc-sections,-print-gc-sections # Do garbage collection on (i.e. remove unused) sections. Also print which sections are removed for debugging purposes.
+	
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
 
 .DEFAULT_GOAL := $(BUILD_DIR)/main.hex
