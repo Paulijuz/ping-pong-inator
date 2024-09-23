@@ -64,8 +64,14 @@ int main(void) {
         // }
 
         // Data test for OLED
-        volatile uint8_t *base = (uint8_t *)0x1200;
-        *base                  = 0xFF;
+        // volatile uint8_t *base = (uint8_t *)0x1200;
+        // *base                  = 0xFF;
+
+        // Char test for OLED
+        char c = uart_receive_char();
+        oled_print_char(c);
+        // oled_print_string("Hello, world!  ");
+        // _delay_ms(15);
     }
 
     return 0;
