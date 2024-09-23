@@ -1,7 +1,7 @@
 /**
  * @file uart.c
  * @author Johansson, Juzenas & Stensrud
- * @brief Uart driver.
+ * @brief Uart driver
  * @version 0.1
  * @date 2024-09-02
  *

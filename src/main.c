@@ -42,20 +42,16 @@ int main(void) {
     joystick_config_t joystick_calibration_config = {
       {2, 158, 254}, // X-calibration
       {2, 164, 254}, // Y-calibration
-      false, // Already calibrated
+      true, // Already calibrated
     };
-    // joystick_config_t joystick_calibration_config;
-    // joystick_calibration_config.calibrated = false;
 
     while (1) {
+        // Calibrate joystick if not already done
         if (!joystick_calibration_config.calibrated) {
             joystick_calibrate(&joystick_calibration_config);
         }
 
-        volatile uint32_t adc_output = adc_read();
-        volatile uint16_t slider     = adc_output >> 2 * 8;
-
-        // Joystick has now been abstracted
+        // Read and print joystick position (both calibrated and raw values)
         joystick_t joy = joystick_read(&joystick_calibration_config);
         printf("Joystick: %03d, %03d | %03d, %03d\r\n", joy.x, joy.y, joy.raw_x, joy.raw_y);
     }
