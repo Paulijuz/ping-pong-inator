@@ -24,7 +24,7 @@ CFLAGS += -ggdb # Tell the compiler to include information for debugging in the 
 CFLAGS += -ffunction-sections # Move functions into their own sections.
 CFLAGS += -fdata-sections # Move data into their own sections.
 CFLAGS += -Wl,-gc-sections,-print-gc-sections # Do garbage collection on (i.e. remove unused) sections. Also print which sections are removed for debugging purposes.
-	
+
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
 
 .DEFAULT_GOAL := $(BUILD_DIR)/main.hex
