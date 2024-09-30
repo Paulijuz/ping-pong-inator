@@ -12,7 +12,7 @@
 #include "drivers/oled.h"
 #include "fonts.h"
 
-static font_config_t font_config = {(const unsigned char *(*)[95])&font8, 8};
+static font_config_t font_config = FONT4_CONFIG;
 
 /**
  * @brief Write command to OLED
