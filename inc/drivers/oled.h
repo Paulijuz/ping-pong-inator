@@ -72,10 +72,16 @@
 
 #define OLED_CMD_NOP                          0xE3 // NOP
 
+#define OLED_BUFFER_BASE_A SRAM_BASE
+#define OLED_BUFFER_BASE_B (SRAM_BASE + 0x400)
+
 #include <stdint.h>
 #include <avr/pgmspace.h>
 
+#include "drivers/sram.h"
 #include "fonts.h"
+
+
 
 void oled_init(void);
 void oled_reset(void);
@@ -87,5 +93,5 @@ void oled_pos(void);
 void oled_set_font(font_config_t *font);
 void oled_print_char(char c);
 void oled_print_string(char *str);
-
+void oled_flush_buffer();
 #endif // OLED_H

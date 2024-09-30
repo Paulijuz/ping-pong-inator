@@ -12,6 +12,7 @@
 #include "drivers/oled.h"
 #include "fonts.h"
 
+uint8_t* oled_buffer_base = SRAM_BASE;
 static font_config_t font_config = FONT4_CONFIG;
 
 /**
@@ -133,5 +134,24 @@ void oled_print_char(char c) {
 void oled_print_string(char *str) {
     while (*str) {
         oled_print_char(*str++);
+    }
+}
+
+
+
+
+void oled_flush_buffer() {
+
+    for (int i = 0; i < 0x400; i++) {
+        *OLED_DATA_BASE = *(oled_buffer_base + i);
+    }
+}
+
+void oled_flip_buffer() {
+    if (oled_buffer_base == OLED_BUFFER_BASE_A) {
+        oled_buffer_base = OLED_BUFFER_BASE_B;
+    }
+    else {
+        oled_buffer_base = OLED_BUFFER_BASE_A;
     }
 }
