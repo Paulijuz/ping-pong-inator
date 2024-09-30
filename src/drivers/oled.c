@@ -120,8 +120,7 @@ void oled_print_char(char c) {
     // memcpy_P((void *)OLED_DATA_BASE, font4[c - 32], 4); // This can be unreliable for some reason??
 
     for (int i = 0; i < font_config.font_width; ++i) {
-        unsigned char (*font_ptr)[95][font_config.font_width] = (unsigned char (*)[95][font_config.font_width]) font_config.font;
-        
+        const unsigned char(*font_ptr)[95][font_config.font_width] = (const unsigned char(*)[95][font_config.font_width])font_config.font_ptr;
         *OLED_DATA_BASE = pgm_read_byte(&((*font_ptr)[c - 32][i]));
     }
 }

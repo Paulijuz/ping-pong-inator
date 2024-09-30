@@ -25,7 +25,7 @@ typedef const unsigned char *(*font_ptr_t)[95];
  *
  */
 typedef struct font_config_s {
-    const unsigned char *(*font)[95];
+    font_ptr_t  font_ptr;
     uint8_t     font_width;
 } font_config_t;
 
