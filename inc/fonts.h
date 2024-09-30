@@ -21,11 +21,6 @@ extern const unsigned char PROGMEM font4[95][4];
 //     font4
 // };
 
-typedef enum font_size_e {
-    FONT_8,
-    FONT_5,
-    FONT_4,
-} font_size_e;
 // clang-format on
 
 /**
@@ -33,7 +28,7 @@ typedef enum font_size_e {
  *
  */
 typedef struct font_config_s {
-    font_size_e font;
+    const unsigned char *(*font)[95];
     uint8_t     font_width;
 } font_config_t;
 

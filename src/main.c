@@ -52,7 +52,7 @@ int main(void) {
     printf("OLED initialized\r\n");
 
     // Decide on font
-    font_config_t font_config = {FONT_4, 4};
+    font_config_t font_config = {(const unsigned char *(*)[95])&font4, 4};
     oled_set_font(&font_config);
 
     while (1) {

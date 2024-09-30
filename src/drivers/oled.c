@@ -12,7 +12,7 @@
 #include "drivers/oled.h"
 #include "fonts.h"
 
-static font_config_t font_config = {FONT_8, 8};
+static font_config_t font_config = {(const unsigned char *(*)[95])&font8, 8};
 
 /**
  * @brief Write command to OLED
@@ -118,18 +118,11 @@ void oled_print_char(char c) {
     // Read font from program memory
     // FROM: https://www.nongnu.org/avr-libc/user-manual/pgmspace.html
     // memcpy_P((void *)OLED_DATA_BASE, font4[c - 32], 4); // This can be unreliable for some reason??
+
     for (int i = 0; i < font_config.font_width; ++i) {
-        switch (font_config.font) {
-        case FONT_8:
-            *OLED_DATA_BASE = pgm_read_byte(&(font8[c - 32][i]));
-            break;
-        case FONT_5:
-            *OLED_DATA_BASE = pgm_read_byte(&(font5[c - 32][i]));
-            break;
-        case FONT_4:
-            *OLED_DATA_BASE = pgm_read_byte(&(font4[c - 32][i]));
-            break;
-        }
+        unsigned char (*font_ptr)[95][font_config.font_width] = (unsigned char (*)[95][font_config.font_width]) font_config.font;
+        
+        *OLED_DATA_BASE = pgm_read_byte(&((*font_ptr)[c - 32][i]));
     }
 }
 
