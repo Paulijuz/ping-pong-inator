@@ -4,7 +4,7 @@ Language: Cpp # Also covers at least C, ObjC, ObjC++
 # Default style
 BasedOnStyle: LLVM
 IndentWidth: 4
-ColumnLimit: 120
+ColumnLimit: 160
 
 # Trailing comments
 AlignTrailingComments:

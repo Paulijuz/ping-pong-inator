@@ -44,13 +44,38 @@
 #define OLED_CMD_SET_IREF_SELECTION_EXTERNAL   0x00 // ???
 #define OLED_CMD_SET_IREF_SELECTION_INTERNAL   0x10 // ???
 
-#define OLED_CMD_DISPLAY_OFF                   0xAE
-#define OLED_CMD_DISPLAY_ON                    0xAF
+#define OLED_CMD_SET_DISPLAY_OFF               0xAE
+#define OLED_CMD_SET_DISPLAY_ON                0xAF
 
 #define OLED_CMD_SET_PAGE_START_ADDRESS        0xB0 // Followed by page start address, 0x00-0x07 (0 - 7)
 
+#define OLED_CMD_SET_COM_OUTPUT_SCAN_DIR_NORM  0xC0 // Normal scan direction
+#define OLED_CMD_SET_COM_OUTPUT_SCAN_DIR_REV   0xC8 // Reversed scan direction
+
+#define OLED_CMD_SET_DISPLAY_OFFSET            0xD3 // Followed by display offset, 0x00-0x3F (0 - 63)
+
+#define OLED_CMD_SET_DISPLAY_CLOCK_DIVIDE                                                                                                                      \
+    0xD5 // Followed by display clock divide ratio/oscillator frequency. A[3:0] = Oscillator frequency, A[7:4] = Divide ratio
+
+#define OLED_CMD_SET_PRECHARGE_PERIOD         0xD9 // Followed by pre-charge period, A[3:0] = Phase 1 period, A[7:4] = Phase 2 period
+
+#define OLED_CMD_SET_COM_PINS_HW_CONF         0xDA // Followed by COM pins hardware configuration
+#define OLED_CMD_SET_COM_PINS_HW_CONF_SEQ_DIS 0x02 // 0b000'00010 // Sequential COM pin configuration,  disable left/right remap
+#define OLED_CMD_SET_COM_PINS_HW_CONF_ALT_DIS 0x12 // 0b001'00010 // Alternative COM pin configuration, disable left/right remap
+#define OLED_CMD_SET_COM_PINS_HW_CONF_SEQ_EN  0x22 // 0b010'00010 // Sequential COM pin configuration,  enable left/right remap
+#define OLED_CMD_SET_COM_PINS_HW_CONF_ALT_EN  0x32 // 0b011'00010 // Alternative COM pin configuration, enable left/right remap
+
+#define OLED_CMD_SET_VCOMH_DESELECT_LEVEL     0xDB // Followed by VCOMH deselect level
+#define OLED_CMD_VCMOH_DESELECT_LEVEL_0       0x00 // 0.65 * VCC
+#define OLED_CMD_VCMOH_DESELECT_LEVEL_1       0x20 // 0.77 * VCC
+#define OLED_CMD_VCMOH_DESELECT_LEVEL_2       0x30 // 0.83 * VCC
+
+#define OLED_CMD_NOP                          0xE3 // NOP
+
 #include <stdint.h>
 #include <avr/pgmspace.h>
+
+#include "fonts.h"
 
 void oled_init(void);
 void oled_reset(void);
@@ -59,6 +84,7 @@ void oled_goto_line(uint8_t line);
 void oled_goto_column(uint8_t column);
 void oled_clear_line(uint8_t line);
 void oled_pos(void);
+void oled_set_font(font_config_t *font);
 void oled_print_char(char c);
 void oled_print_string(char *str);
 

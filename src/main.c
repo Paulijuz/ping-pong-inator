@@ -20,6 +20,7 @@
 #include "drivers/adc.h"
 #include "drivers/joystick.h"
 #include "drivers/oled.h"
+#include "fonts.h"
 
 // Cutoff frequency of filter: 795 Hz
 // Slope: 20 dB per decade
@@ -49,6 +50,10 @@ int main(void) {
     // Initialize OLED
     oled_init();
     printf("OLED initialized\r\n");
+
+    // Decide on font
+    font_config_t font_config = {FONT_4, 4};
+    oled_set_font(&font_config);
 
     while (1) {
         // Read and print joystick position (both calibrated and raw values)
