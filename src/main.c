@@ -26,7 +26,9 @@
 // Slope: 20 dB per decade
 
 int main(void) {
-    MCUCR |= 1 << SRE; // MCU Control Register bit SRE ??
+
+    // Initialize SRAM
+    sram_init();
 
     // Initialize UART
     uart_init(9600);
