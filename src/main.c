@@ -56,6 +56,7 @@ int main(void) {
     // Decide on font
     font_config_t font_config = FONT5_CONFIG;
     oled_set_font(&font_config);
+    oled_clear_screen();
 
     while (1) {
         // Read and print joystick position (both calibrated and raw values)
@@ -76,7 +77,13 @@ int main(void) {
 
         // Char test for OLED
         char c = uart_receive_char();
-        oled_print_char(c);
+        if (c == 13 ) {
+            oled_clear_line(oled_get_line());
+        } else {
+            oled_print_char(c);
+        }
+        oled_flip_buffer();
+        oled_flush_buffer();
         // oled_print_string("Hello, world!  ");
         // _delay_ms(15);
     }

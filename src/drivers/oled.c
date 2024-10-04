@@ -12,8 +12,16 @@
 #include "drivers/oled.h"
 #include "fonts.h"
 
-uint8_t* oled_buffer_base = SRAM_BASE;
+#include <string.h>
+
+uint8_t* oled_disp_buffer_base = OLED_BUFFER_BASE_A;
+uint8_t* oled_draw_buffer_base = OLED_BUFFER_BASE_B;
 static font_config_t font_config = FONT4_CONFIG;
+
+
+uint8_t oled_current_line = 0;
+uint16_t oled_current_column = 0;
+
 
 /**
  * @brief Write command to OLED
@@ -51,7 +59,7 @@ void oled_init(void) {
     oled_cmd_write_char(0x21);
 
     oled_cmd_write_char(OLED_CMD_SET_MEMORY_ADDRESSING_MODE); // Set Memory Addressing Mode
-    oled_cmd_write_char(OLED_CMD_MEMORY_ADDRESS_MODE_HORIZ);
+    oled_cmd_write_char(OLED_CMD_MEMORY_ADDRESS_MODE_VERT);
 
     oled_cmd_write_char(OLED_CMD_SET_VCOMH_DESELECT_LEVEL); // VCOM deselect level mode
     oled_cmd_write_char(OLED_CMD_VCMOH_DESELECT_LEVEL_2);
@@ -68,16 +76,28 @@ void oled_reset(void) {}
 void oled_home(void) {}
 
 /**
- * @brief Go to line (page) on OLED
+ * @brief Go to line (bytes) on OLED
  *
  * @param line
  */
 void oled_goto_line(uint8_t line) {
-    // Move to page
-    oled_cmd_write_char(0xb0 + line);
+    oled_current_line = line; 
 }
 
-void oled_goto_column(uint8_t column);
+/**
+ * @brief Go to column (pixels) on OLED
+ * 
+ * @param column 
+ */
+
+void oled_goto_column(uint8_t column) {
+
+    oled_current_column = column;
+}
+
+
+
+
 
 /**
  * @brief Clear line on OLED
@@ -85,13 +105,24 @@ void oled_goto_column(uint8_t column);
  * @param line
  */
 void oled_clear_line(uint8_t line) {
-    oled_goto_line(line);
-    for (uint8_t i = 0; i < 128; ++i) {
-        *OLED_DATA_BASE = 0x00;
+    for (uint8_t i = 0; i < OLED_WIDTH_PIXELS; ++i) {
+        *((oled_draw_buffer_base + line) + i*OLED_HEIGHT_BYTES) = 0x00; 
     }
 }
 
-void oled_pos(void);
+
+void oled_clear_screen() {
+    for (int i = 0; i < OLED_BUFFER_SIZE; ++i) {
+        *(oled_draw_buffer_base + i) = 0x00;
+    }
+}
+
+
+uint8_t* oled_pos(void) {
+
+    return oled_draw_buffer_base + oled_current_line + oled_current_column*8;
+
+}
 
 /**
  * @brief Set font for OLED
@@ -103,16 +134,26 @@ void oled_set_font(font_config_t *font) {
     font_config = *font;
 }
 
+
+
 void oled_print_char(char c) {
     if (c < 32 || c > 126) {
         c = 126;
     }
 
+    if (oled_current_column + font_config.font_width >= OLED_WIDTH_PIXELS) {
+        oled_cursor_increment();
+    }
+    
+    uint8_t* draw_pointer = oled_pos();
+ 
+
     // Special case for space
     if (c == 32) {
         for (int i = 0; i < font_config.font_width; ++i) {
-            *OLED_DATA_BASE = 0x00;
+            *(draw_pointer + i*OLED_HEIGHT_BYTES) = 0x00;
         }
+        oled_cursor_increment();
         return;
     }
 
@@ -120,9 +161,25 @@ void oled_print_char(char c) {
     // FROM: https://www.nongnu.org/avr-libc/user-manual/pgmspace.html
     // memcpy_P((void *)OLED_DATA_BASE, font4[c - 32], 4); // This can be unreliable for some reason??
 
+    const unsigned char(*font_ptr)[95][font_config.font_width] = (const unsigned char(*)[95][font_config.font_width])font_config.font_ptr;
+    
     for (int i = 0; i < font_config.font_width; ++i) {
-        const unsigned char(*font_ptr)[95][font_config.font_width] = (const unsigned char(*)[95][font_config.font_width])font_config.font_ptr;
-        *OLED_DATA_BASE = pgm_read_byte(&((*font_ptr)[c - 32][i]));
+
+        *(draw_pointer + i*OLED_HEIGHT_BYTES) = pgm_read_byte(&((*font_ptr)[c - 32][i]));
+    }
+
+    oled_cursor_increment();
+}
+
+
+void oled_cursor_increment() {
+    oled_current_column += font_config.font_width;
+
+    if (oled_current_column >= OLED_WIDTH_PIXELS) {
+        oled_current_line++;
+        oled_current_line %= OLED_HEIGHT_BYTES;
+
+        oled_current_column = 0;
     }
 }
 
@@ -141,17 +198,33 @@ void oled_print_string(char *str) {
 
 
 void oled_flush_buffer() {
+    oled_cmd_write_char(OLED_CMD_SET_COLUMN_ADDRESS);
+    oled_cmd_write_char(0);
+    oled_cmd_write_char(OLED_WIDTH_PIXELS - 1);
+    
+    oled_cmd_write_char(OLED_CMD_SET_PAGE_ADDRESS);
+    oled_cmd_write_char(0);
+    oled_cmd_write_char(OLED_HEIGHT_BYTES - 1);
 
-    for (int i = 0; i < 0x400; i++) {
-        *OLED_DATA_BASE = *(oled_buffer_base + i);
+    for (int i = 0; i < OLED_BUFFER_SIZE; i++) {
+        *OLED_DATA_BASE = *(oled_disp_buffer_base + i);
     }
 }
 
 void oled_flip_buffer() {
-    if (oled_buffer_base == OLED_BUFFER_BASE_A) {
-        oled_buffer_base = OLED_BUFFER_BASE_B;
-    }
-    else {
-        oled_buffer_base = OLED_BUFFER_BASE_A;
-    }
+
+    memcpy(oled_disp_buffer_base, oled_draw_buffer_base, OLED_BUFFER_SIZE);
+
+    uint8_t* temp_buffer_flip = oled_disp_buffer_base;
+    oled_disp_buffer_base = oled_draw_buffer_base;
+    oled_draw_buffer_base = temp_buffer_flip;
+    // oled_clear_screen();
+}
+
+uint8_t oled_get_line() {
+    return oled_current_line;
+}
+
+uint16_t oled_get_column() {
+    return oled_current_column;
 }

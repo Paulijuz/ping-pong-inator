@@ -12,6 +12,11 @@
 #ifndef OLED_H
 #define OLED_H
 
+#define OLED_HEIGHT_BYTES 8
+#define OLED_WIDTH_PIXELS 128
+#define OLED_BUFFER_SIZE (OLED_HEIGHT_BYTES * OLED_WIDTH_PIXELS)
+
+
 #define OLED_CMD_BASE  (volatile uint8_t *)0x1000
 #define OLED_CMD_END   (volatile uint8_t *)0x11FF
 #define OLED_DATA_BASE (volatile uint8_t *)0x1200
@@ -89,10 +94,14 @@ void oled_home(void);
 void oled_goto_line(uint8_t line);
 void oled_goto_column(uint8_t column);
 void oled_clear_line(uint8_t line);
-void oled_pos(void);
+void oled_clear_screen(void);
+uint8_t* oled_pos(void);
 void oled_set_font(font_config_t *font);
 void oled_print_char(char c);
 void oled_print_string(char *str);
-void oled_flush_buffer();
-void oled_flip_buffer();
+void oled_flush_buffer(void);
+void oled_flip_buffer(void);
+
+uint8_t oled_get_line(void);
+uint16_t oled_get_column(void);
 #endif // OLED_H
