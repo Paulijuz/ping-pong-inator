@@ -94,4 +94,5 @@ void oled_set_font(font_config_t *font);
 void oled_print_char(char c);
 void oled_print_string(char *str);
 void oled_flush_buffer();
+void oled_flip_buffer();
 #endif // OLED_H
