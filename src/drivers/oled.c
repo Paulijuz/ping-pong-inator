@@ -13,6 +13,7 @@
 #include "fonts.h"
 
 #include <string.h>
+#include <avr/interrupt.h>
 
 uint8_t* oled_disp_buffer_base = OLED_BUFFER_BASE_A;
 uint8_t* oled_draw_buffer_base = OLED_BUFFER_BASE_B;
@@ -70,6 +71,11 @@ void oled_init(void) {
     oled_cmd_write_char(OLED_CMD_SET_ENTIRE_DISPLAY_ON); // out follows RAM content
     oled_cmd_write_char(OLED_CMD_SET_NORMAL_DISPLAY);    // set normal display
     oled_cmd_write_char(OLED_CMD_SET_DISPLAY_ON);        // display on
+
+    OCR0 = (80);                      // Set TOP for timer 0
+    TCCR0 |= (1 << WGM01 | 1 << CS02 | 1 << CS00); // Enable CTC and set clock prescaler to 1024
+    TIMSK |= (1 << OCIE0); // Enable timer interrupt  
+
 }
 
 void oled_reset(void) {}
@@ -228,3 +234,10 @@ uint8_t oled_get_line() {
 uint16_t oled_get_column() {
     return oled_current_column;
 }
+
+
+
+ISR (TIMER0_COMP_vect) {
+    oled_flush_buffer();
+}
+

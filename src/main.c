@@ -13,6 +13,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdint.h>
+#include <avr/interrupt.h>
 
 // #include "sram_test.h"
 
@@ -57,6 +58,7 @@ int main(void) {
     font_config_t font_config = FONT5_CONFIG;
     oled_set_font(&font_config);
     oled_clear_screen();
+    sei();
 
     while (1) {
         // Read and print joystick position (both calibrated and raw values)
@@ -83,7 +85,6 @@ int main(void) {
             oled_print_char(c);
         }
         oled_flip_buffer();
-        oled_flush_buffer();
         // oled_print_string("Hello, world!  ");
         // _delay_ms(15);
     }
