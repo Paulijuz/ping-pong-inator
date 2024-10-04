@@ -12,13 +12,14 @@
 #include "drivers/adc.h"
 
 /**
- * @brief Initialize ADC by setting PD5 on MCU as PWM output
+ * @brief Initialize ADC by setting PD5 on MCU as PWM output.
+ * @warning Uses timer 1!
  *
  */
 void adc_init() {
     DDRD |= (1 << DDD5);                   // Set PD5 as output
 
-    OCR1A = (1 << 0);                      // Set TOP
+    OCR1A = (1 << 0);                      // Set TOP for timer 1
 
     TCCR1A |= (1 << COM1A0);               // Compare Output Mode
 
