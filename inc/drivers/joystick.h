@@ -13,13 +13,14 @@
 #define JOYSTICK_H
 
 #include "defines.h" // Required for F_CPU, used in util/delay.h
-#include <util/delay.h>
+#include "drivers/adc.h"
 
+#include <math.h>
+#include <util/delay.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "drivers/adc.h"
 
 /**
  * @brief Joystick calibration values
@@ -31,6 +32,8 @@
 
 #define CALIBRATION_DELAY 1500 // ms, delay between calibration steps (for human interaction)
 
+#define JOY_DEADZONE 50
+
 typedef enum JOYSTICK_INITIALIZATION_STATE {
     JOYSTICK_NO_CALIBRATE,
     JOYSTICK_USE_DEFAULT_CALIBRATION,
@@ -40,8 +43,8 @@ typedef enum JOYSTICK_INITIALIZATION_STATE {
 // clang-format off
 typedef enum JOYSTICK_DIR {
     JOYSTICK_CENTER,
-    JOYSTICK_TOP,
-    JOYSTICK_BOTTOM,
+    JOYSTICK_UP,
+    JOYSTICK_DOWN,
     JOYSTICK_RIGHT,
     JOYSTICK_LEFT,
 
@@ -77,13 +80,16 @@ typedef struct joystick_s {
     int8_t  x;
     int8_t  y;
 
+    e_JOYSTICK_DIR dir;
+    bool dir_changed;
+
     uint8_t raw_x;
     uint8_t raw_y;
 } joystick_t;
 
 void       joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE state);
 void       joystick_calibrate(joystick_config_t *config);
-joystick_t joystick_read(joystick_config_t *config);
+joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir);
 joystick_t joystick_read_raw(void);
 int8_t     joystick_adjust(uint8_t value, joystick_config_axis_t axis_config);
 

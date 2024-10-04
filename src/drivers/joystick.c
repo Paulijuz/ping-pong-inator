@@ -42,8 +42,8 @@ void joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE st
 void joystick_calibrate_axis(e_JOYSTICK_DIR axis, joystick_config_t *config) {
     const char *axis_names[5];
     axis_names[JOYSTICK_CENTER] = "center";
-    axis_names[JOYSTICK_TOP]    = "top";
-    axis_names[JOYSTICK_BOTTOM] = "bottom";
+    axis_names[JOYSTICK_UP]    = "top";
+    axis_names[JOYSTICK_DOWN] = "bottom";
     axis_names[JOYSTICK_RIGHT]  = "right";
     axis_names[JOYSTICK_LEFT]   = "left";
 
@@ -64,9 +64,9 @@ void joystick_calibrate_axis(e_JOYSTICK_DIR axis, joystick_config_t *config) {
     if (axis == JOYSTICK_CENTER) {
         config->x_config.center = calx;
         config->y_config.center = caly;
-    } else if (axis == JOYSTICK_TOP) {
+    } else if (axis == JOYSTICK_UP) {
         config->y_config.max = caly;
-    } else if (axis == JOYSTICK_BOTTOM) {
+    } else if (axis == JOYSTICK_DOWN) {
         config->y_config.min = caly;
     } else if (axis == JOYSTICK_RIGHT) {
         config->x_config.max = calx;
@@ -110,13 +110,37 @@ void joystick_calibrate(joystick_config_t *config) {
 /**
  * @brief Read adjusted x/y and raw_x/raw_y values from joystick
  *
- * @param config
+ * @param config Calibration config to use.
+ * @param prev_dir The direction of the joystick from the previous read. Used for detecting if the joystick position changed.
  * @return joystick_t
  */
-joystick_t joystick_read(joystick_config_t *config) {
+joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
     joystick_t position = joystick_read_raw();
-    position.x          = joystick_adjust(position.raw_x, config->x_config);
-    position.y          = joystick_adjust(position.raw_y, config->y_config);
+    
+    int8_t x = joystick_adjust(position.raw_x, config->x_config);
+    int8_t y = joystick_adjust(position.raw_y, config->y_config);
+
+    if (x*x + y*y < JOY_DEADZONE) return position;
+
+    position.x = x;
+    position.y = y;
+
+    if (x*x > y*y) {
+        if (x > 0) {
+            position.dir = JOYSTICK_RIGHT;
+        } else {
+            position.dir = JOYSTICK_LEFT;
+        }
+    } else {
+        if (y > 0) {
+            position.dir = JOYSTICK_UP;
+        } else {
+            position.dir = JOYSTICK_DOWN;
+        }
+    }
+
+    position.dir_changed = prev_dir != position.dir;
+
     return position;
 }
 
@@ -129,10 +153,12 @@ joystick_t joystick_read_raw(void) {
     uint32_t   adc_output     = adc_read() >> (2 * 8);
     // uint16_t   joystick_raw   = adc_output & 0xFFFF;
     joystick_t position = {
-      .x     = 0,
-      .y     = 0,
-      .raw_x = adc_output & 0xFF,
-      .raw_y = (adc_output >> 8) & 0xFF,
+      .x           = 0,
+      .y           = 0,
+      .dir         = JOYSTICK_CENTER,
+      .dir_changed = false,
+      .raw_x       = adc_output & 0xFF,
+      .raw_y       = (adc_output >> 8) & 0xFF,
     };
     return position;
 }
