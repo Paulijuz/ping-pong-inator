@@ -179,7 +179,7 @@ void oled_print_char(char c) {
 
 
 void oled_cursor_increment() {
-    oled_current_column += font_config.font_width;
+    oled_current_column += font_config.font_width + 1;
 
     if (oled_current_column >= OLED_WIDTH_PIXELS) {
         oled_current_line++;

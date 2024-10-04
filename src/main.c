@@ -21,12 +21,20 @@
 #include "drivers/adc.h"
 #include "drivers/joystick.h"
 #include "drivers/oled.h"
+#include "drivers/menu.h"
 #include "fonts.h"
 
 // Cutoff frequency of filter: 795 Hz
 // Slope: 20 dB per decade
 
 int main(void) {
+
+    draw_string main_menu_list[] = {
+    {"START", 2, OLED_WIDTH_PIXELS/2 -4*4},
+    {"OPTIONS", 4, OLED_WIDTH_PIXELS/2 -4*4},
+    {"EXIT", 6, OLED_WIDTH_PIXELS/2 -4*4},
+    {">", 4, OLED_WIDTH_PIXELS/2 -4*6},
+    };
 
     // Initialize SRAM
     sram_init();
@@ -78,15 +86,22 @@ int main(void) {
         // *base                  = 0xFF;
 
         // Char test for OLED
-        char c = uart_receive_char();
-        if (c == 13 ) {
-            oled_clear_line(oled_get_line());
-        } else {
-            oled_print_char(c);
-        }
-        oled_flip_buffer();
+        // char c = uart_receive_char();
+        // if (c == 13 ) {
+        //     oled_clear_line(oled_get_line());
+        // } else {
+        //     oled_print_char(c);
+        // }
+        // oled_flip_buffer();
         // oled_print_string("Hello, world!  ");
         // _delay_ms(15);
+
+
+
+        //List test for Menu
+        menu_draw_list(main_menu_list, 4);
+        oled_flip_buffer();
+
     }
 
     return 0;
