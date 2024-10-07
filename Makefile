@@ -15,18 +15,25 @@ BUILD_DIR := build
 TARGET_CPU := atmega162
 TARGET_DEVICE := m162
 
+# Okay so somtiems the mcu goes in to a crash loop, i.e. it starts and almost immediatly crashes and then starts again and so on.
+# What we've narrowed it down to is that is probably has something to do with the binary file. Either it is corrupted,
+# uses too much stack or something else. We though that disabling ffuntion-sections and fdata-sections flags and turning on
+# optimalization with respect to size (the Os flag) would help. And it did... until it didn't. So we're still not sure what
+# the problem is. But for now playing with the optimalization flag and the section flags seems like the best option.
+
+# Skratch all that. The MCU was f**ked.
+
 CC := avr-gcc
 CFLAGS := $(C_INCLUDES) # Specify all the include files for the compiler.
-CFLAGS += -Os # Enable optimalization with repesct to size. (If its not with respect to size the binary will be unstable.)
+CFLAGS += -O # Enable optimalization with repesct to size.
 CFLAGS += -std=c11 # Specify C version.
 CFLAGS += -mmcu=$(TARGET_CPU) # Target CPU instructions.
 CFLAGS += -ggdb # Tell the compiler to include information for debugging in the final binary file.
+CFLAGS += -fshort-enums # Tell the compiler to use the smallest possible data type for enums.
+CFLAGS += -ffunction-sections # Move functions into their own sections.
+CFLAGS += -fdata-sections # Move data into their own sections.
 
-# The flags bellow make the binary file unstable some times for some reason. We don't know why, but we'll leave them out for now.
-# CFLAGS += -ffunction-sections # Move functions into their own sections.
-# CFLAGS += -fdata-sections # Move data into their own sections.
-
-CFLAGS += -Wl,-gc-sections,-print-gc-sections # Do garbage collection on (i.e. remove unused) sections. Also print which sections are removed for debugging purposes.
+CFLAGS += -Wl,--gc-sections,--print-gc-sections # Do garbage collection on (i.e. remove unused) sections. Also print which sections are removed for debugging purposes.
 
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
 
