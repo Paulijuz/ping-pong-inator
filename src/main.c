@@ -18,6 +18,7 @@
 // #include "sram_test.h"
 
 #include "drivers/uart.h"
+#include "drivers/button.h"
 #include "drivers/adc.h"
 #include "drivers/joystick.h"
 #include "drivers/oled.h"
@@ -119,7 +120,10 @@ int main(void) {
             }
             
         }
-        printf("%d %d \r \n",joystick_dir.dir, joystick_dir.y);
+        // print button states
+        printf("Button states: %d, %d, %d, %d\r\n", button_left_pressed(), button_right_pressed(), button_left_held(), button_right_held());
+
+
         oled_clear_screen();
 
         menu_draw_list(main_menu_list, 3);
