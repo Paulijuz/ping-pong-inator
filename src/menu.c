@@ -13,6 +13,29 @@
 
 #include "drivers/oled.h"
 #include "drivers/menu.h"
+#include "drivers/joystick.h"
+
+void menu_move_arrow(joystick_t joystick_dir) {
+     if (joystick_dir.dir == JOYSTICK_UP && joystick_dir.dir_changed) {
+            arrow_pos -= 2;
+            if (arrow_pos < 2) {
+                arrow_pos = 6;
+            }
+
+        } else if(joystick_dir.dir == JOYSTICK_DOWN && joystick_dir.dir_changed) {
+            arrow_pos += 2;
+             if (arrow_pos > 6) {
+                arrow_pos = 2;
+            }
+            
+        }
+}
+
+
+void menu_switch_screen(){}
+
+
+
 
 void menu_draw_list(draw_string* draw_list, int list_length) {
 

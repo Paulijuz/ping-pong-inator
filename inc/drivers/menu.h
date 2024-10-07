@@ -22,6 +22,12 @@ typedef struct {
 } draw_string;
 
 
+//menu arrow position
+int arrow_pos = 2;
+
+void menu_move_arrow(joystick_t joystick_dir);
+
+void menu_switch_screen();
 
 
 void menu_draw_list(draw_string* draw_list, int list_length);
