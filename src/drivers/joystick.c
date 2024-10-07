@@ -124,12 +124,12 @@ joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
     int8_t x = position.raw_x - 128;
     int8_t y = position.raw_y - 128;
 
-    if (x*x + y*y < JOY_DEADZONE*JOY_DEADZONE) return position;
+    if (pow(x, 2) + pow(y, 2) < pow(JOY_DEADZONE,2)) return position;
 
     position.x = x;
     position.y = y;
 
-    if (x*x > y*y) {
+    if (pow(x, 2) > pow(y, 2)) {
         if (x > 0) {
             position.dir = JOYSTICK_RIGHT;
         } else {

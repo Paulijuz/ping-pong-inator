@@ -64,8 +64,6 @@ void menu_move_arrow(joystick_t joystick_dir) {
 
 
 void menu_draw_list(int list_length) {
-
-
     if (button_right_pressed()) {
         printf("%s", current_screen[arrow_pos/2-1].string);
         current_screen = current_screen[arrow_pos/2 -1].next_screen;

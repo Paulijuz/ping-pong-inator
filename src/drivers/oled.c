@@ -89,6 +89,10 @@ void oled_init(void) {
     TIMSK |= (1 << OCIE0);
 }
 
+/**
+ * @brief Routes printf to OLED.
+ * 
+ */
 void oled_enable_printf(void) {
     fdevopen(oled_print_char_file, NULL);
 }
@@ -180,12 +184,11 @@ void oled_print_char(char c) {
 
     // Read font from program memory
     // FROM: https://www.nongnu.org/avr-libc/user-manual/pgmspace.html
-    // memcpy_P((void *)OLED_DATA_BASE, font4[c - 32], 4); // This can be unreliable for some reason??
+    // memcpy_P((void *)OLED_DATA_BASE, font4[c - 32], 4); // This can be unreliable for some reason?? It was unreliable because out atmega was f**ked!
 
     const unsigned char(*font_ptr)[95][font_config.font_width] = (const unsigned char(*)[95][font_config.font_width])font_config.font_ptr;
     
     for (int i = 0; i < font_config.font_width; ++i) {
-
         *(draw_pointer + i*OLED_HEIGHT_BYTES) = pgm_read_byte(&((*font_ptr)[c - 32][i]));
     }
 
@@ -256,6 +259,11 @@ bool oled_should_flush() {
     return oled_buffer_should_flush;
 }
 
-ISR (TIMER0_COMP_vect) {
+void oled_set_contrast(uint8_t contrast) {
+    oled_cmd_write_char(OLED_CMD_SET_CONTRAST); // contrast command
+    oled_cmd_write_char(contrast); // contrast value
+}
+
+ISR(TIMER0_COMP_vect) {
     oled_buffer_should_flush = true;
 }

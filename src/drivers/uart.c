@@ -15,10 +15,6 @@
 #include <avr/interrupt.h>
 #include <stdio.h>
 
-void uart_enable_printf(void) {
-    fdevopen(uart_transmit_char_file, NULL);
-}
-
 /**
  * Initalizes usart 0.
  */
@@ -41,8 +37,14 @@ void uart_init(unsigned int baud_rate) {
     UCSR0C = (1 << URSEL0) | // Enable read/write for UCSRC and disable read/write for UBRRH.
              (1 << USBS0) |  // Set number of stop bits to 2.
              (3 << UCSZ00);  // Set number of data bits to 8.
+}
 
-    uart_enable_printf();
+/**
+ * @brief Routes printf to uart 0.
+ * 
+ */
+void uart_enable_printf(void) {
+    fdevopen(uart_transmit_char_file, NULL);
 }
 
 /**

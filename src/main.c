@@ -22,6 +22,7 @@
 #include "drivers/adc.h"
 #include "drivers/joystick.h"
 #include "drivers/oled.h"
+#include "drivers/sliders.h"
 #include "drivers/menu.h"
 #include "fonts.h"
 
@@ -30,15 +31,12 @@
 int main(void) {
     cli();
 
-
-    
-
-
     // Initialize SRAM
     sram_init();
 
     // Initialize UART
     uart_init(9600);
+    uart_enable_printf();
 
     // Program startup
     printf("\r\n--- Program startup ---\r\n");
@@ -70,8 +68,8 @@ int main(void) {
 
     while (1) {
         // Read and print joystick position (both calibrated and raw values)
-        // joystick_t joy = joystick_read(&joystick_calibration_config);
-        // printf("Joystick: %03d, %03d | %03d, %03d\r\n", joy.x, joy.y, joy.raw_x, joy.raw_y);
+        joystick_t joy = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
+        printf("Joystick: %03d, %03d | %03d, %03d, %d\r\n", joy.x, joy.y, joy.raw_x, joy.raw_y, joy.dir);
 
         // Chip-select test for OLED
         // volatile uint8_t *base = (uint8_t *)0x1000;
@@ -102,14 +100,13 @@ int main(void) {
 
 
         joystick_dir = joystick_read(&joystick_calibration_config, joystick_dir.dir);
+        
         menu_move_arrow(joystick_dir);
-        // print button states
-        // printf("Button states: %d, %d, %d, %d\r\n", button_left_pressed(), button_right_pressed(), button_left_held(), button_right_held());
-
 
         oled_clear_screen();
   
         menu_draw_list(3);
+
         oled_goto_column(OLED_WIDTH_PIXELS/2 -4*6);
         oled_goto_line(arrow_pos);
         oled_print_char('>');

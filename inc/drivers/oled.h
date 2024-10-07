@@ -91,6 +91,7 @@
 
 
 void oled_init(void);
+void oled_enable_printf(void);
 void oled_reset(void);
 void oled_home(void);
 void oled_goto_line(uint8_t line);
@@ -105,6 +106,7 @@ void oled_cursor_increment(void);
 void oled_flush_buffer(void);
 void oled_flip_buffer(void);
 bool oled_should_flush(void);
+void oled_set_contrast(uint8_t contrast);
 int oled_print_char_file(char data, FILE *file);
 
 uint8_t oled_get_line(void);

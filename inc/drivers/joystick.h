@@ -32,7 +32,7 @@
 
 #define CALIBRATION_DELAY 1500 // ms, delay between calibration steps (for human interaction)
 
-#define JOY_DEADZONE 100
+#define JOY_DEADZONE 50
 
 typedef enum JOYSTICK_INITIALIZATION_STATE {
     JOYSTICK_NO_CALIBRATE,
