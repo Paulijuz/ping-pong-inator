@@ -31,9 +31,9 @@ int main(void) {
     cli();
 
     draw_string main_menu_list[] = {
-    {"START", 2, OLED_WIDTH_PIXELS/2 -4*4},
-    {"OPTIONS", 4, OLED_WIDTH_PIXELS/2 -4*4},
-    {"EXIT", 6, OLED_WIDTH_PIXELS/2 -4*4}
+        {"START", 2, OLED_WIDTH_PIXELS/2 -4*4},
+        {"OPTIONS", 4, OLED_WIDTH_PIXELS/2 -4*4},
+        {"EXIT", 6, OLED_WIDTH_PIXELS/2 -4*4}
     };
 
     // Initialize SRAM
@@ -69,7 +69,7 @@ int main(void) {
     sei();
 
     joystick_t joystick_dir = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
-    int arrow_pos = 0;
+    int arrow_pos = 2;
 
     while (1) {
         // Read and print joystick position (both calibrated and raw values)
@@ -119,9 +119,7 @@ int main(void) {
             }
             
         }
-        if (joystick_dir.dir_changed) {
-        printf("%d \r \n",joystick_dir.dir);
-        }
+        printf("%d %d \r \n",joystick_dir.dir, joystick_dir.y);
         oled_clear_screen();
 
         menu_draw_list(main_menu_list, 3);

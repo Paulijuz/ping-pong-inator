@@ -116,11 +116,15 @@ void joystick_calibrate(joystick_config_t *config) {
  */
 joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
     joystick_t position = joystick_read_raw();
-    
-    int8_t x = joystick_adjust(position.raw_x, config->x_config);
-    int8_t y = joystick_adjust(position.raw_y, config->y_config);
 
-    if (x*x + y*y < JOY_DEADZONE) return position;
+    // Comment out calibration until it is fixed.
+    // position.x = joystick_adjust(position.raw_x, config->x_config);
+    // position.y = joystick_adjust(position.raw_y, config->y_config);
+
+    int8_t x = position.raw_x - 128;
+    int8_t y = position.raw_y - 128;
+
+    if (x*x + y*y < JOY_DEADZONE*JOY_DEADZONE) return position;
 
     position.x = x;
     position.y = y;
