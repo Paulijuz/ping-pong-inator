@@ -15,6 +15,7 @@
 #include <string.h>
 #include <avr/interrupt.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 uint8_t* oled_disp_buffer_base = OLED_BUFFER_BASE_A;
 uint8_t* oled_draw_buffer_base = OLED_BUFFER_BASE_B;
@@ -24,6 +25,7 @@ static font_config_t font_config = FONT4_CONFIG;
 uint8_t oled_current_line = 0;
 uint16_t oled_current_column = 0;
 
+bool oled_buffer_should_flush = false;
 
 /**
  * @brief Write command to OLED
@@ -73,10 +75,18 @@ void oled_init(void) {
     oled_cmd_write_char(OLED_CMD_SET_NORMAL_DISPLAY);    // set normal display
     oled_cmd_write_char(OLED_CMD_SET_DISPLAY_ON);        // display on
 
-    OCR0 = (80);                      // Set TOP for timer 0
-    TCCR0 |= (1 << WGM01 | 1 << CS02 | 1 << CS00); // Enable CTC and set clock prescaler to 1024
-    TIMSK |= (1 << OCIE0); // Enable timer interrupt  
+    // OCR0 = (80); // Set TOP for timer 0
+    // TCCR0 |= (1 << WGM01 | 1 << CS02 | 1 << CS00); // Enable CTC and set clock prescaler to 1024
+    // TIMSK |= (1 << OCIE0); // Enable timer interrupt  
 
+    // Set the compare value for 50 Hz interrupt (assuming 4.9152 MHz clock and 1024 prescaler)
+    OCR0 = 95;
+
+    // Set CTC mode for Timer 0 (Clear Timer on Compare Match)
+    TCCR0 |= (1 << WGM01 | 1 << CS02 | 1 << CS00);
+
+    // Enable Timer 0 Compare Match Interrupt
+    TIMSK |= (1 << OCIE0);
 }
 
 void oled_enable_printf(void) {
@@ -176,7 +186,7 @@ void oled_print_char(char c) {
     
     for (int i = 0; i < font_config.font_width; ++i) {
 
-        *(draw_pointer + i*OLED_HEIGHT_BYTES) = 0xEE;//pgm_read_byte(&((*font_ptr)[c - 32][i]));
+        *(draw_pointer + i*OLED_HEIGHT_BYTES) = pgm_read_byte(&((*font_ptr)[c - 32][i]));
     }
 
     oled_cursor_increment();
@@ -206,6 +216,8 @@ void oled_print_string(char *str) {
 }
 
 void oled_flush_buffer() {
+    oled_buffer_should_flush = false;
+
     oled_cmd_write_char(OLED_CMD_SET_COLUMN_ADDRESS);
     oled_cmd_write_char(0);
     oled_cmd_write_char(OLED_WIDTH_PIXELS - 1);
@@ -240,8 +252,10 @@ int oled_print_char_file(char data, FILE *file) {
     return 0;
 }
 
-
-ISR (TIMER0_COMP_vect) {
-    oled_flush_buffer();
+bool oled_should_flush() {
+    return oled_buffer_should_flush;
 }
 
+ISR (TIMER0_COMP_vect) {
+    oled_buffer_should_flush = true;
+}

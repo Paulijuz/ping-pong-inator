@@ -83,6 +83,7 @@
 #include <stdint.h>
 #include <avr/pgmspace.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "drivers/sram.h"
 #include "fonts.h"
@@ -103,6 +104,7 @@ void oled_print_string(char *str);
 void oled_cursor_increment(void);
 void oled_flush_buffer(void);
 void oled_flip_buffer(void);
+bool oled_should_flush(void);
 int oled_print_char_file(char data, FILE *file);
 
 uint8_t oled_get_line(void);

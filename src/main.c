@@ -28,6 +28,7 @@
 // Slope: 20 dB per decade
 
 int main(void) {
+    cli();
 
     draw_string main_menu_list[] = {
     {"START", 2, OLED_WIDTH_PIXELS/2 -4*4},
@@ -101,6 +102,10 @@ int main(void) {
         //List test for Menu
         menu_draw_list(main_menu_list, 4);
         oled_flip_buffer();
+
+        if (oled_should_flush()) {
+            oled_flush_buffer();
+        }
 
     }
 
