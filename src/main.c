@@ -27,15 +27,12 @@
 
 // Cutoff frequency of filter: 795 Hz
 // Slope: 20 dB per decade
-
 int main(void) {
     cli();
 
-    draw_string main_menu_list[] = {
-        {"START", 2, OLED_WIDTH_PIXELS/2 -4*4},
-        {"OPTIONS", 4, OLED_WIDTH_PIXELS/2 -4*4},
-        {"EXIT", 6, OLED_WIDTH_PIXELS/2 -4*4}
-    };
+
+    
+
 
     // Initialize SRAM
     sram_init();
@@ -70,7 +67,6 @@ int main(void) {
     sei();
 
     joystick_t joystick_dir = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
-    int arrow_pos = 2;
 
     while (1) {
         // Read and print joystick position (both calibrated and raw values)
@@ -106,27 +102,14 @@ int main(void) {
 
 
         joystick_dir = joystick_read(&joystick_calibration_config, joystick_dir.dir);
-
-        if (joystick_dir.dir == JOYSTICK_UP && joystick_dir.dir_changed) {
-            arrow_pos -= 2;
-            if (arrow_pos < 2) {
-                arrow_pos = 6;
-            }
-
-        } else if(joystick_dir.dir == JOYSTICK_DOWN && joystick_dir.dir_changed) {
-            arrow_pos += 2;
-             if (arrow_pos > 6) {
-                arrow_pos = 2;
-            }
-            
-        }
+        menu_move_arrow(joystick_dir);
         // print button states
-        printf("Button states: %d, %d, %d, %d\r\n", button_left_pressed(), button_right_pressed(), button_left_held(), button_right_held());
+        // printf("Button states: %d, %d, %d, %d\r\n", button_left_pressed(), button_right_pressed(), button_left_held(), button_right_held());
 
 
         oled_clear_screen();
-
-        menu_draw_list(main_menu_list, 3);
+  
+        menu_draw_list(3);
         oled_goto_column(OLED_WIDTH_PIXELS/2 -4*6);
         oled_goto_line(arrow_pos);
         oled_print_char('>');
