@@ -14,6 +14,7 @@
 
 #include <string.h>
 #include <avr/interrupt.h>
+#include <stdio.h>
 
 uint8_t* oled_disp_buffer_base = OLED_BUFFER_BASE_A;
 uint8_t* oled_draw_buffer_base = OLED_BUFFER_BASE_B;
@@ -76,6 +77,10 @@ void oled_init(void) {
     TCCR0 |= (1 << WGM01 | 1 << CS02 | 1 << CS00); // Enable CTC and set clock prescaler to 1024
     TIMSK |= (1 << OCIE0); // Enable timer interrupt  
 
+}
+
+void oled_enable_printf(void) {
+    fdevopen(oled_print_char_file, NULL);
 }
 
 void oled_reset(void) {}
@@ -171,7 +176,7 @@ void oled_print_char(char c) {
     
     for (int i = 0; i < font_config.font_width; ++i) {
 
-        *(draw_pointer + i*OLED_HEIGHT_BYTES) = pgm_read_byte(&((*font_ptr)[c - 32][i]));
+        *(draw_pointer + i*OLED_HEIGHT_BYTES) = 0xEE;//pgm_read_byte(&((*font_ptr)[c - 32][i]));
     }
 
     oled_cursor_increment();
@@ -200,9 +205,6 @@ void oled_print_string(char *str) {
     }
 }
 
-
-
-
 void oled_flush_buffer() {
     oled_cmd_write_char(OLED_CMD_SET_COLUMN_ADDRESS);
     oled_cmd_write_char(0);
@@ -218,13 +220,10 @@ void oled_flush_buffer() {
 }
 
 void oled_flip_buffer() {
-
     memcpy(oled_disp_buffer_base, oled_draw_buffer_base, OLED_BUFFER_SIZE);
-
     uint8_t* temp_buffer_flip = oled_disp_buffer_base;
     oled_disp_buffer_base = oled_draw_buffer_base;
     oled_draw_buffer_base = temp_buffer_flip;
-    // oled_clear_screen();
 }
 
 uint8_t oled_get_line() {
@@ -235,6 +234,11 @@ uint16_t oled_get_column() {
     return oled_current_column;
 }
 
+int oled_print_char_file(char data, FILE *file) {
+    oled_print_char(data);
+
+    return 0;
+}
 
 
 ISR (TIMER0_COMP_vect) {
