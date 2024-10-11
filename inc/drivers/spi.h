@@ -13,7 +13,10 @@
 #define SPI_H
 
 
-void SPI_MasterInit(void);
-void SPI_MasterTransmit(char cData);
+void spi_init_master(void);
+void spi_master_transmit(char cData);
+char spi_master_read(void);
+void spi_enable_slave(void);
+void spi_disable_slave(void);
 
 #endif //SPI_H

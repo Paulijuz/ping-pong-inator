@@ -24,6 +24,7 @@
 #include "drivers/oled.h"
 #include "drivers/sliders.h"
 #include "drivers/menu.h"
+#include "drivers/spi.h"
 #include "fonts.h"
 
 // Cutoff frequency of filter: 795 Hz
@@ -66,10 +67,17 @@ int main(void) {
 
     joystick_t joystick_dir = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
 
+    // Initialize SPI
+    spi_init_master();
+    spi_enable_slave();
+    spi_master_transmit(0b11000000);
+    spi_disable_slave();
+    char i = 0;
+
     while (1) {
-        // Read and print joystick position (both calibrated and raw values)
-        joystick_t joy = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
-        printf("Joystick: %03d, %03d | %03d, %03d, %d\r\n", joy.x, joy.y, joy.raw_x, joy.raw_y, joy.dir);
+        // // Read and print joystick position (both calibrated and raw values)
+        // joystick_t joy = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
+        // printf("Joystick: %03d, %03d | %03d, %03d, %d\r\n", joy.x, joy.y, joy.raw_x, joy.raw_y, joy.dir);
 
         // Chip-select test for OLED
         // volatile uint8_t *base = (uint8_t *)0x1000;
@@ -116,7 +124,24 @@ int main(void) {
             oled_flush_buffer();
         }
 
+        //Test SPI
+
+        spi_enable_slave();
+        spi_master_transmit(0b00000011);
+        spi_master_transmit(i);
+        char data1 = spi_master_read();
+
+        printf("%.2X \r \n", data1);
+
+        spi_disable_slave();
+        i++;
+        _delay_ms(10);
+
     }
+
+
+
+
 
     return 0;
 }
