@@ -17,6 +17,7 @@
 
 void mcp_reset(void);
 char mcp_read(char adress);
+char mcp_read_rx_buffer(char adress);
 void mcp_write(char adress, char data);
 void mcp_load_tx_buffer(char data);
 void mcp_request_to_send(void);
