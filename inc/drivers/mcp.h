@@ -24,6 +24,10 @@
 #define MCP_READ_STATUS 0b10100000
 #define MCP_RX_STATUS 0b10110000
 
+#define MCP_CANCTRL 0b00001111
+#define MCP_CANCTRL_REQOP_MASK 0b11100000
+#define MCP_CANCTRL_REQOP_LOOPBACK (0b010 << 5)
+
 void mcp_reset(void);
 char mcp_read(char address);
 char mcp_read_rx_buffer(char buffer);

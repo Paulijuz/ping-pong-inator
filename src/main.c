@@ -25,6 +25,8 @@
 #include "drivers/sliders.h"
 #include "drivers/menu.h"
 #include "drivers/spi.h"
+#include "drivers/mcp.h"
+#include "drivers/can.h"
 #include "fonts.h"
 
 // Cutoff frequency of filter: 795 Hz
@@ -69,10 +71,7 @@ int main(void) {
 
     // Initialize SPI
     spi_init_master();
-    spi_enable_slave();
-    spi_master_transmit(0b11000000);
-    spi_disable_slave();
-    char i = 0;
+    can_init();
 
     while (1) {
         // // Read and print joystick position (both calibrated and raw values)
@@ -126,17 +125,28 @@ int main(void) {
 
         //Test SPI
 
-        spi_enable_slave();
-        spi_master_transmit(0b00000011);
-        spi_master_transmit(i);
-        char data1 = spi_master_read();
+        // spi_enable_slave();
+        // spi_master_transmit(0b00000011);
+        // spi_master_transmit(i);
+        // char data1 = spi_master_read();
 
-        printf("%.2X \r \n", data1);
+        // printf("%.2X \r \n", data1);
 
-        spi_disable_slave();
-        i++;
-        _delay_ms(10);
+        // spi_disable_slave();
+        // i++;
+        // _delay_ms(10);
 
+
+        //Test CAN
+
+
+        char transmit_data = 'a';
+        char data;
+
+        can_transmit(0,&transmit_data, 1);
+        can_recieve(&data, 1);
+
+        printf("%d \r \n", data);
     }
 
 
