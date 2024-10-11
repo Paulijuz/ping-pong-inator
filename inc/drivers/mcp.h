@@ -12,16 +12,23 @@
 #ifndef MCP_H
 #define MCP_H
 
+#define MCP_RESET 0b11000000
+#define MCP_READ  0b00000011
+#define MCP_WRITE 0b00000010
+#define MCP_REQUEST_TO_SEND(channels) (0b10000000 | (channels & 0b111))
+#define MCP_BIT_MODIFY 0b00000101
+#define MCP_READ_STATUS 0b10100000
+
 #include "drivers/spi.h"
 
 
 void mcp_reset(void);
-char mcp_read(char adress);
-char mcp_read_rx_buffer(char adress);
-void mcp_write(char adress, char data);
+char mcp_read(char address);
+char mcp_read_rx_buffer(char address);
+void mcp_write(char address, char data);
 void mcp_load_tx_buffer(char data);
-void mcp_request_to_send(void);
-void mcp_bit_modify(char adress, char mask, char data);
+void mcp_request_to_send(char channels);
+void mcp_bit_modify(char address, char mask, char data);
 char mcp_read_status(void);
 char mcp_rx_status(void);
 
