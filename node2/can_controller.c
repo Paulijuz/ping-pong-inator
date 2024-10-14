@@ -12,8 +12,6 @@
 
 #include "sam.h"
 
-#include "../uart_and_printf/printf-stdarg.h"
-
 
 /**
  * \brief Initialize can bus with predefined number of rx and tx mailboxes, 

@@ -1,66 +1,58 @@
-LDSCRIPT = sam/flash.ld
-BOOTUP = sam/sam3x/source/exceptions.c sam/sam3x/source/startup_sam3x.c sam/sam3x/source/system_sam3x.c
-MCUTYPE = __SAM3X8E__
-# List all source files to be compiled; separate with whitespace.
-# In particular, remember to add the UART and CAN starter files.
-# Use relative file paths.
-SOURCE_FILES=$(BOOTUP) 
-	main.c
-#   filename1.h
-#   filename2.h
+SOURCE_DIR := ./
+BUILD_DIR := build/
+MODULES_DIR := $(SOURCE_DIR)/inc
+INCLUDE_DIR := $(MODULES_DIR) sam/sam3x/include sam/sam3x/source sam/interrupt sam/cmsis sam
 
-# Feel free to ignore anything below this line
+SOURCE_FILES := $(foreach sdir,$(SOURCE_DIR),$(wildcard $(sdir)*.c))
+SOURCE_FILES += $(foreach sdir,$(MODULES_DIR),$(wildcard $(sdir)*.c))
+CPPCHECK_SRC := $(SOURCE_FILES)
+SOURCE_FILES += $(foreach sdir,sam/sam3x/source/,$(wildcard $(sdir)*.c))
+OBJECT_FILES := $(subst $(MODULES_DIR),$(BUILD_DIR),$(SOURCE_FILES:.c=.o))
+OBJECT_FILES := $(subst $(SOURCE_DIR),$(BUILD_DIR),$(OBJECT_FILES))
+INCLUDE_DIR := $(addprefix -I,$(INCLUDE_DIR))
+
 VPATH:= $(dir $(SOURCE_FILES))
-BUILD_DIR := build
-OBJS := $(patsubst %.c, $(BUILD_DIR)/%$(ARCH)$(DEBUG).o, $(notdir $(SOURCE_FILES)))
-#Tools
 CC:=arm-none-eabi-gcc
 LD:=arm-none-eabi-gcc
-AR:=arm-none-eabi-ar
 AS:=arm-none-eabi-as
 
-ELF=$(BUILD_DIR)/main.elf
-
+LDSCRIPT = sam/flash.ld
+TARGET_CPU = __SAM3X8E__
 LDFLAGS:= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3 -Wl,--gc-sections
-CFLAGS:= -mcpu=cortex-m3 -mthumb -g -std=c11 -MMD
-CFLAGS+= -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I .
-CFLAGS+= -D $(MCUTYPE)
+CFLAGS:= -mcpu=cortex-m3 -mthumb -ggdb -std=c11 -Wall -Os
+CFLAGS+= $(INCLUDE_DIR)
+CFLAGS+= -D $(TARGET_CPU)
+# do not uncomment if you have epilepsy
+#CFLAGS+= -Wpadded -Wall -Wextra -Wshadow -Wdouble-promotion -Wformat=2 -Wundef -fno-common -Wconversion -fstack-usage -Wstack-usage=255 -ffunction-sections -fdata-sections 
 
+# QUITE := @
+
+ELF=$(BUILD_DIR)main.elf
 .DEFAULT_GOAL := $(ELF)
-# compile and generate dependancy info
 $(BUILD_DIR):
-	mkdir $(BUILD_DIR)
+	$(QUITE) mkdir $(BUILD_DIR)
 
-$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
-	$(CC) -c $(CFLAGS) $< -o $@
-	#$(CC) -MM $(CFLAGS) $< > $@.d
+$(BUILD_DIR)%.o : %.c | $(BUILD_DIR)
+	$(QUITE) $(CC) -c $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/%.o : %.s | $(BUILD_DIR)
-	$(AS) $< -o $@
+$(BUILD_DIR)%.o : %.s | $(BUILD_DIR)
+	$(QUITE) $(AS) $< -o $@
 
-$(ELF) : $(OBJS) | $(BUILD_DIR)
-	$(LD) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
-
+$(ELF) : $(OBJECT_FILES) | $(BUILD_DIR)
+	$(QUITE) $(LD) $(LDFLAGS) -o $@ $(OBJECT_FILES) $(LDLIBS)
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR)
-
-.PHONY: debug
-debug: $(ELF)
-	if pgr openocd; then killall -s 9 openocd; fi
-	x-terminal-emulator -e openocd -f sam/openocd.cfg -c "program $(ELF) verify"
-	sleep 5
-	arm-eabi-gdb -tui -iex "target extended-remote localhost:3333" $(ELF)
-	killall -s 9 openocd	
+	$(QUIET) rm -rf $(BUILD_DIR) $(DOCS_DIR)
 
 .PHONY: flash
 flash: $(ELF)
-	#./sam/write_bin.sh sam/openocd.cfg $(BUILD_DIR)/main.elf
-	if pgr openocd; then killall -s 9 openocd; fi
-	openocd -f sam/openocd.cfg -c "program ${BUILD_DIR}/main.elf verify reset exit"
+	$(QUITE) openocd -d0 -f sam/openocd.cfg -c "program $(ELF) reset exit"
 
+.PHONY: check
+check:
+	cppcheck --enable=all $(CPPCHECK_SRC) $(INCLUDE_DIR) --language=c -q $(TARGET_CPU)
 
-# pull in dependencies
--include	$(OBJS:.o=.d)
-
+.PHONY: docs
+docs: $(DOCS_DIR)
+	doxygen 

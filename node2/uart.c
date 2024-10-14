@@ -1,18 +1,16 @@
 #include "sam.h"
 #include <stdio.h>
 
-#define F_CPU 84000000
-
-typedef struct RingBuf RingBuf;
-struct RingBuf {
+typedef struct RingBuf {
     uint8_t buffer[1024];
     int capacity;
     
     int insertIdx;
     int removeIdx;
     int length;
-};
-RingBuf RingBuf = {0};
+} RingBuf;
+
+static RingBuf ring_buf = {0};
 
 
 int push(RingBuf* rb, uint8_t val){
@@ -64,7 +62,7 @@ void uart_tx(uint8_t val){
 }
 
 uint8_t uart_rx(uint8_t* val){
-    return pop(&RingBuf, val);
+    return pop(&ring_buf, val);
 }    
 
 int uart_flush(char* buf, int len){
@@ -90,7 +88,7 @@ void UART_Handler(){
     
     // Receive ready: push to ring buffer
     if(status & UART_SR_RXRDY){
-        if(!push(&RingBuf, UART->UART_RHR & 0xff)){
+        if(!push(&ring_buf, UART->UART_RHR & 0xff)){
             printf("UART receive buffer full\n");
         }
     }

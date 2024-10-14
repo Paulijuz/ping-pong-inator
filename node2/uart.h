@@ -1,3 +1,6 @@
+#pragma once
+
+#include <stdint.h>
 
 // UART is connected to the ATmega16U2 on the Arduino, which acts as a USB serial device.
 // This module hooks into the stdio functions, by spoofing several system calls
@@ -9,6 +12,7 @@
 // are lost, until the buffer is full. If necessary, you can change this buffer size in 
 // uart.c
 
+#define F_CPU 84000000
 
 // Initialize. Hooks stdio functions (like `printf`)
 void uart_init(uint32_t cpufreq, uint32_t baudrate);
