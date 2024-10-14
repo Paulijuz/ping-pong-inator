@@ -2,7 +2,8 @@
     "env": {
         "myDefaultIncludePath": [
             "${workspaceFolder}/**"
-        ]
+        ],
+        "myDefines": [ ]
     },
     "configurations": [
         {
