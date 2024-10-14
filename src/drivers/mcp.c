@@ -17,28 +17,28 @@ void mcp_reset(void) {
     spi_disable_slave();
 }
 
-char mcp_read(char address) {
+uint8_t mcp_read(uint8_t address) {
     spi_enable_slave();
     spi_master_transmit(MCP_READ);
     spi_master_transmit(address);
-    char data = spi_master_receive();
+    uint8_t data = spi_master_receive();
     spi_disable_slave();
     return data;
 
 }
 
-char mcp_read_rx_buffer(char buffer) {
-    spi_enable_slave();
+// void mcp_read_rx_buffer(uint8_t buffer, uint8_t* data, int length) {
+//     spi_enable_slave();
 
-    spi_master_transmit(MCP_READ_RX_BUFFER(buffer));
-    char data = spi_master_receive();
+//     spi_master_transmit(MCP_READ_RX_BUFFER(buffer));
+//     uint8_t data = spi_master_receive();
 
-    spi_disable_slave();
+//     spi_disable_slave();
 
-    return data;
-}
+//     return data;
+// }
 
-void mcp_write(char address, char data) {
+void mcp_write(uint8_t address, uint8_t data) {
     spi_enable_slave();
     spi_master_transmit(MCP_WRITE);
     spi_master_transmit(address);
@@ -46,22 +46,25 @@ void mcp_write(char address, char data) {
     spi_disable_slave();
 }
 
-void mcp_load_tx_buffer(char buffer, char data) {
-    spi_enable_slave();
+// void mcp_load_tx_buffer(uint8_t buffer, uint8_t* data, int length) {
+//     spi_enable_slave();
 
-    spi_master_transmit(MCP_LOAD_TX_BUFFER(buffer));
-    spi_master_transmit(data);
+//     spi_master_transmit(MCP_LOAD_TX_BUFFER(buffer));
+   
+//     for (int i = 0; i < length; i++) {
+//         spi_master_transmit(data[i]);
+//     }
 
-    spi_disable_slave();
-}
+//     spi_disable_slave();
+// }
 
-void mcp_request_to_send(char channels) {
+void mcp_request_to_send(uint8_t channels) {
     spi_enable_slave();
     spi_master_transmit(MCP_REQUEST_TO_SEND(channels));
     spi_disable_slave();
 }
 
-void mcp_bit_modify(char address, char mask, char data) {
+void mcp_bit_modify(uint8_t address, uint8_t mask, uint8_t data) {
     spi_enable_slave();
     spi_master_transmit(MCP_BIT_MODIFY);
     spi_master_transmit(address);
@@ -71,11 +74,11 @@ void mcp_bit_modify(char address, char mask, char data) {
 }
 
 
-char mcp_read_status(void) {
+uint8_t mcp_read_status(void) {
     spi_enable_slave();
 
     spi_master_transmit(MCP_READ_STATUS);
-    char status = spi_master_receive();
+    uint8_t status = spi_master_receive();
     spi_master_receive(); // The MCP will send a copy of status, but we will simply ignore it.
 
     spi_disable_slave();
@@ -83,11 +86,11 @@ char mcp_read_status(void) {
     return status;
 }
 
-char mcp_rx_status(void) {
+uint8_t mcp_rx_status(void) {
     spi_enable_slave();
 
     spi_master_transmit(MCP_RX_STATUS);
-    char status = spi_master_receive();
+    uint8_t status = spi_master_receive();
     spi_master_receive(); // The MCP will send a copy of status, but we will simply ignore it.
 
     spi_disable_slave();

@@ -73,6 +73,7 @@ int main(void) {
     spi_init_master();
     can_init();
 
+    int i = 0;
     while (1) {
         // // Read and print joystick position (both calibrated and raw values)
         // joystick_t joy = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
@@ -139,17 +140,28 @@ int main(void) {
 
         //Test CAN
 
+        can_message_s t_message = i%2 ? (can_message_s){
+            .data = "Hello,",
+            .length = 6,
+            .id = i++,
+        } : (can_message_s){
+            .data = "world!",
+            .length = 6,
+            .id = i++,
+        };
 
-        char transmit_data = 'a';
-        char data;
+        can_transmit(&t_message);
 
-        can_transmit(0,&transmit_data, 1);
-        can_receive(&data, 1);
+        can_message_s r_message;
 
-        // printf("%d \r \n", data);
+        if (can_receive(&r_message)) {
+            printf("%u: %s \r\n", r_message.id, r_message.data);
+        } else {
+            printf("Ingen data mottatt :(\r\n");
+        }
+
+        _delay_ms(100);
     }
-
-
 
 
 

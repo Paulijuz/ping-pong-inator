@@ -10,17 +10,18 @@
  */
 
 #ifndef CAN_H
-
 #define CAN_H
 
+#include <stdbool.h>
+
+typedef struct can_message_s {
+    uint16_t id;
+    char data[8];
+    uint8_t length;
+} can_message_s;
 
 void can_init(void);
-
-void can_transmit(int id, char* data, int length);
-
-int can_receive(char* data, int max_size);
-
-
-
+void can_transmit(can_message_s* message);
+bool can_receive(can_message_s* message);
 
 #endif //CAN_H
