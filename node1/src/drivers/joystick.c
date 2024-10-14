@@ -116,32 +116,23 @@ void joystick_calibrate(joystick_config_t *config) {
  */
 joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
     joystick_t position = joystick_read_raw();
+    int8_t     x_adjusted = joystick_adjust(position.raw_x, config->x_config);
+    int8_t     y_adjusted = joystick_adjust(position.raw_y, config->y_config);
+    if (pow(x_adjusted, 2) + pow(y_adjusted, 2) < pow(JOY_DEADZONE, 2))
+        return position; // X, Y are default 0
 
-    // Comment out calibration until it is fixed.
-    // position.x = joystick_adjust(position.raw_x, config->x_config);
-    // position.y = joystick_adjust(position.raw_y, config->y_config);
+    position.x = x_adjusted;
+    position.y = y_adjusted;
 
-    int8_t x = position.raw_x - 128;
-    int8_t y = position.raw_y - 128;
-
-    if (pow(x, 2) + pow(y, 2) < pow(JOY_DEADZONE,2)) return position;
-
-    position.x = x;
-    position.y = y;
-
-    if (pow(x, 2) > pow(y, 2)) {
-        if (x > 0) {
-            position.dir = JOYSTICK_RIGHT;
-        } else {
-            position.dir = JOYSTICK_LEFT;
-        }
+    // clang-format off
+    if (pow(position.x, 2) > pow(position.y, 2)) {
+        if (position.x > 0) position.dir = JOYSTICK_RIGHT;
+        else                position.dir = JOYSTICK_LEFT;
     } else {
-        if (y > 0) {
-            position.dir = JOYSTICK_UP;
-        } else {
-            position.dir = JOYSTICK_DOWN;
-        }
+        if (position.y > 0) position.dir = JOYSTICK_UP;
+        else                position.dir = JOYSTICK_DOWN;
     }
+    // clang-format on
 
     position.dir_changed = prev_dir != position.dir;
 
@@ -189,7 +180,9 @@ int8_t joystick_adjust(uint8_t value, joystick_config_axis_t axis_config) {
 }
 
 /**
- * @brief Map values from one range to another
+ * @brief Specialized map function for the joystick, as the input is always 0->255 (uint8_t) and the output is always -128->127 (int8_t)
+ * @note This function is not a general-purpose map function, but is specialized for the joystick.
+ *       THIS CAN BE OPTIMIZED, SINCE IT PERFORMS FLOATING POINT OPERATIONS AND DIVISION
  *
  * @param val
  * @param in_min
@@ -198,6 +191,13 @@ int8_t joystick_adjust(uint8_t value, joystick_config_axis_t axis_config) {
  * @param out_max
  * @return int8_t
  */
-int8_t map_int8(int8_t val, int8_t in_min, int8_t in_max, int8_t out_min, int8_t out_max) {
-    return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+int8_t map_int8(uint8_t val, uint8_t in_min, uint8_t in_max, int8_t out_min, int8_t out_max) {
+    uint8_t input     = val - in_min;
+    uint8_t in_range  = in_max - in_min;
+    uint8_t out_range = out_max - out_min;
+    float   divisor = (float)out_range / in_range; // Using float might not be necessary, as flooring the division might be enough given it is done in the right
+                                                   // order: https://stackoverflow.com/a/5732117
+    int8_t mapped = out_min + divisor * input;
+
+    return mapped;
 }

@@ -112,15 +112,12 @@ int main(void) {
         menu_move_arrow(joystick_dir);
 
         oled_clear_screen();
-  
-        menu_draw_list(3);
 
-        oled_goto_column(OLED_WIDTH_PIXELS/2 -4*6);
-        oled_goto_line(arrow_pos);
-        oled_print_char('>');
-        oled_flip_buffer();
+        menu_draw_list();
 
+        // Switch buffers that are drawn
         if (oled_should_flush()) {
+            oled_flip_buffer();
             oled_flush_buffer();
         }
 

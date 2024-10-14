@@ -9,33 +9,39 @@
  * 
  */
 
-#include <stdint.h>
-#include "drivers/joystick.h"
-
 #ifndef MENU_H
 #define MENU_H
 
+#include <stdint.h>
+#include "drivers/joystick.h"
+
+/**
+ * @brief Menu string struct
+ *
+ */
 typedef struct draw_string_s {
     char* string;
     uint8_t line;
     uint16_t column;
-    struct draw_string_s* next_screen;
-} draw_string;
+    struct menu_page_s *next_page;
+} draw_string_t;
 
+/**
+ * @brief Menu page struct
+ *
+ */
+typedef struct menu_page_s {
+    draw_string_t *list;
+    uint8_t        list_length;
+} menu_page_t;
 
-//menu arrow position
+// Menu arrow position
 extern int arrow_pos;
 
-extern draw_string main_menu_list[];
-extern draw_string options_menu_list[];
-extern draw_string not_impl_list[];
-extern draw_string exit_list[];
-
-
-extern draw_string* current_screen;
+// Current menu screen
+extern menu_page_t *current_page;
 
 void menu_move_arrow(joystick_t joystick_dir);
-
-void menu_draw_list(int list_length);
+void menu_draw_list(void);
 
 #endif
