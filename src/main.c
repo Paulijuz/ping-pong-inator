@@ -128,7 +128,7 @@ int main(void) {
         // spi_enable_slave();
         // spi_master_transmit(0b00000011);
         // spi_master_transmit(i);
-        // char data1 = spi_master_read();
+        // char data1 = spi_master_receive();
 
         // printf("%.2X \r \n", data1);
 
@@ -144,9 +144,9 @@ int main(void) {
         char data;
 
         can_transmit(0,&transmit_data, 1);
-        can_recieve(&data, 1);
+        can_receive(&data, 1);
 
-        printf("%d \r \n", data);
+        // printf("%d \r \n", data);
     }
 
 

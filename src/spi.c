@@ -23,17 +23,17 @@ void spi_init_master(void) {
 
     spi_disable_slave();
 }
-void spi_master_transmit(char cData) {
+void spi_master_transmit(char data) {
     /* Start transmission */
 
-    SPDR = cData;
+    SPDR = data;
 
     /* Wait for transmission complete */
     while (!(SPSR & (1 << SPIF))) {
     };
 }
 
-char spi_master_read(void) {
+char spi_master_receive(void) {
 
     spi_master_transmit(0x00);
 

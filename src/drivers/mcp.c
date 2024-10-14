@@ -21,7 +21,7 @@ char mcp_read(char address) {
     spi_enable_slave();
     spi_master_transmit(MCP_READ);
     spi_master_transmit(address);
-    char data = spi_master_read();
+    char data = spi_master_receive();
     spi_disable_slave();
     return data;
 
@@ -31,7 +31,7 @@ char mcp_read_rx_buffer(char buffer) {
     spi_enable_slave();
 
     spi_master_transmit(MCP_READ_RX_BUFFER(buffer));
-    char data = spi_master_read();
+    char data = spi_master_receive();
 
     spi_disable_slave();
 
@@ -75,8 +75,8 @@ char mcp_read_status(void) {
     spi_enable_slave();
 
     spi_master_transmit(MCP_READ_STATUS);
-    char status = spi_master_read();
-    spi_master_read(); // The MCP will send a copy of status, but we will simply ignore it.
+    char status = spi_master_receive();
+    spi_master_receive(); // The MCP will send a copy of status, but we will simply ignore it.
 
     spi_disable_slave();
 
@@ -87,8 +87,8 @@ char mcp_rx_status(void) {
     spi_enable_slave();
 
     spi_master_transmit(MCP_RX_STATUS);
-    char status = spi_master_read();
-    spi_master_read(); // The MCP will send a copy of status, but we will simply ignore it.
+    char status = spi_master_receive();
+    spi_master_receive(); // The MCP will send a copy of status, but we will simply ignore it.
 
     spi_disable_slave();
 

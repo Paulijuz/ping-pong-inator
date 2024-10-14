@@ -18,7 +18,7 @@ void can_init(void);
 
 void can_transmit(int id, char* data, int length);
 
-int can_recieve(char* data, int max_size);
+int can_receive(char* data, int max_size);
 
 
 

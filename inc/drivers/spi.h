@@ -15,7 +15,7 @@
 
 void spi_init_master(void);
 void spi_master_transmit(char cData);
-char spi_master_read(void);
+char spi_master_receive(void);
 void spi_enable_slave(void);
 void spi_disable_slave(void);
 
