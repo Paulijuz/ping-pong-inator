@@ -1,6 +1,6 @@
-SOURCE_DIR := ./
+SOURCE_DIR := src/
 BUILD_DIR := build/
-MODULES_DIR := $(SOURCE_DIR)/inc
+MODULES_DIR := inc/
 INCLUDE_DIR := $(MODULES_DIR) sam/sam3x/include sam/sam3x/source sam/interrupt sam/cmsis sam
 
 SOURCE_FILES := $(foreach sdir,$(SOURCE_DIR),$(wildcard $(sdir)*.c))
