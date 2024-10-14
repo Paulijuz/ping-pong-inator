@@ -1,0 +1,35 @@
+{
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}/**"
+        ]
+    },
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "${myDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-clang-x64"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "${myDefaultIncludePath}",
+                "/opt/homebrew/Cellar/avr-gcc@14/14.1.0/avr/include/**"
+            ],
+            "defines": [
+                "${myDefines}"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-x64"
+        }
+    ],
+    "version": 4
+}

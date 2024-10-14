@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "../node1",
+		},
+		{
+			"path": "../node2",
+		},
+		{
+			"path": "../",
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"sam.h": "c",
+			"uart.h": "c",
+			"stdarg.h": "c",
+			"stdio.h": "c"
+		}
+	}
+}
