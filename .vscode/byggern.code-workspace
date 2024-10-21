@@ -1,15 +1,12 @@
 {
 	"folders": [
-		{
-			"path": "../node1",
-		},
-		{
-			"path": "../node2",
-		},
-		{
-			"path": "../",
-		}
-	],
+        {
+            "path": "../node1"
+        },
+        {
+            "path": "../node2"
+        }
+    ],
 	"settings": {
 		"files.associations": {
 			"sam.h": "c",

@@ -26,7 +26,7 @@ TARGET_DEVICE := m162
 CC := avr-gcc
 CFLAGS := $(C_INCLUDES) # Specify all the include files for the compiler.
 CFLAGS += -O # Enable optimalization with repesct to size.
-CFLAGS += -std=c11 # Specify C version.
+CFLAGS += -std=c23 # Specify C version. (C23 because of digit separator, see https://stackoverflow.com/a/73918479)
 CFLAGS += -mmcu=$(TARGET_CPU) # Target CPU instructions.
 CFLAGS += -ggdb # Tell the compiler to include information for debugging in the final binary file.
 CFLAGS += -fshort-enums # Tell the compiler to use the smallest possible data type for enums.

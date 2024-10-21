@@ -53,3 +53,6 @@ dkms.conf
 
 # VSCODE
 .vscode/settings.json
+
+# MacOS
+.DS_Store
