@@ -26,8 +26,9 @@
 #define MCP_READ_STATUS                0b10100000
 #define MCP_RX_STATUS                  0b10110000
 
-#define MCP_CANCTRL                0b00001111
-#define MCP_CANCTRL_REQOP_MASK     0b11100000
+#define MCP_CANCTRL                 0b00001111
+#define MCP_CANCTRL_REQOP_MASK      0b11100000
+#define MCP_CANCTRL_REQOP_NORMAL   (0b000 << 5)
 #define MCP_CANCTRL_REQOP_LOOPBACK (0b010 << 5)
 
 #define MCP_CANINTF             0b00101100

@@ -16,7 +16,7 @@
 
 void can_init(void) {
     mcp_reset();
-    mcp_bit_modify(MCP_CANCTRL, MCP_CANCTRL_REQOP_MASK, MCP_CANCTRL_REQOP_LOOPBACK);
+    mcp_bit_modify(MCP_CANCTRL, MCP_CANCTRL_REQOP_MASK, MCP_CANCTRL_REQOP_NORMAL);
     mcp_bit_modify(MCP_RXB0CTRL, MCP_RXB0CTRL_RXM_MASK, MCP_RXB0CTRL_RXM_FILTER_OFF);
 }
 
