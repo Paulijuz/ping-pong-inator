@@ -27,13 +27,14 @@ int main()
     uint8_t i = 0;
     while (1) {
       CAN0_Handler();
-      CAN_MESSAGE can_msg = {
-        .id          = i++,
-        .data_length = 6,
-        .data        = "world!"
-      };
-      can_send(&can_msg, 0);
 
-      time_spinFor(msecs(1));
+      // Sending messages
+      // CAN_MESSAGE can_msg = {
+      //   .id          = i++,
+      //   .data_length = 6,
+      //   .data        = "world!"
+      // };
+      // can_send(&can_msg, 0);
+      // time_spinFor(msecs(1));
     }
 }
