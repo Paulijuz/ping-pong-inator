@@ -52,6 +52,25 @@
 #define MCP_LOAD_TX_BUFFER_0_ID   0
 #define MCP_LOAD_TX_BUFFER_0_DATA 1
 
+#define MCP_CNF1 0x2A
+#define MCP_CNF1_BRP 0 
+#define MCP_CNF1_SJW 6
+
+#define MCP_CNF2 0x29
+#define MCP_CNF2_BTLMODE 7
+#define MCP_CNF2_SAM 6
+#define MCP_CNF2_PHSEG1 3
+#define MCP_CNF2_PRSEG 0
+
+#define MCP_CNF3 0x28
+#define MCP_CNF3_SOF 7
+#define MCP_CNF3_WAKFIL 6
+#define MCP_CNF3_PHSEG2 0
+
+
+
+
+
 void mcp_reset(void);
 uint8_t mcp_read(uint8_t address);
 uint8_t mcp_read_rx_buffer(uint8_t buffer);
