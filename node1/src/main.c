@@ -67,7 +67,7 @@ int main(void) {
     oled_clear_screen();
     sei();
 
-    joystick_t joystick_dir = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
+    joystick_t joystick = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
 
     // Initialize SPI
     spi_init_master();
@@ -107,9 +107,9 @@ int main(void) {
         //List test for Menu
 
 
-        joystick_dir = joystick_read(&joystick_calibration_config, joystick_dir.dir);
+        joystick = joystick_read(&joystick_calibration_config, joystick.dir);
         
-        menu_move_arrow(joystick_dir);
+        menu_move_arrow(joystick);
 
         oled_clear_screen();
 
@@ -134,20 +134,13 @@ int main(void) {
         // i++;
         // _delay_ms(10);
 
+        can_message_s t_message = {
+            .data = { joystick.x, joystick.y },
+            .length = 2,
+            .id = 0,
+        };
 
-        //Test CAN
-
-        // can_message_s t_message = i%2 ? (can_message_s){
-        //     .data = "Hello,",
-        //     .length = 6,
-        //     .id = i++,
-        // } : (can_message_s){
-        //     .data = "world!",
-        //     .length = 6,
-        //     .id = i++,
-        // };
-
-        // can_transmit(&t_message);
+        can_transmit(&t_message);
 
         can_message_s r_message;
 
@@ -157,17 +150,11 @@ int main(void) {
             printf("Ingen data mottatt :(\r\n");
         }
 
-        _delay_ms(1000);
+        _delay_ms(10);
 
         printf("%x \r\n", mcp_read(0x30));
-        // printf("%x \r\n", mcp_read_status());
-
-
-
-
+        // printf("%x \r\n", mcp_read_status())
     }
-
-
 
     return 0;
 }
