@@ -16,13 +16,15 @@
 
 void can_init(void) {
     mcp_reset();
-    mcp_write(MCP_CNF1,(0 << MCP_CNF1_SJW) | (4 << MCP_CNF1_BRP)); //Set SJW to 1*TQ and BRP to 4
+
+    mcp_write(MCP_CNF1,(0 << MCP_CNF1_SJW) | (3 << MCP_CNF1_BRP)); //Set SJW to 1*TQ and BRP to 3
     mcp_write(MCP_CNF2, (1 << MCP_CNF2_BTLMODE) | (0 << MCP_CNF2_SAM) | (6 << MCP_CNF2_PHSEG1) | (1 << MCP_CNF2_PRSEG));
     mcp_write(MCP_CNF3, (5 << MCP_CNF3_PHSEG2));
 
+    mcp_bit_modify(MCP_CANCTRL, MCP_CANCTRL_OSM_MASK, (0 << MCP_CANCTRL_OSM));
     mcp_bit_modify(MCP_CANCTRL, MCP_CANCTRL_REQOP_MASK, MCP_CANCTRL_REQOP_NORMAL);
     mcp_bit_modify(MCP_RXB0CTRL, MCP_RXB0CTRL_RXM_MASK, MCP_RXB0CTRL_RXM_FILTER_OFF);
-    
+
 }
 
 void can_transmit(can_message_s* message) {

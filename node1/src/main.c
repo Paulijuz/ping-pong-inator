@@ -137,17 +137,17 @@ int main(void) {
 
         //Test CAN
 
-        can_message_s t_message = i%2 ? (can_message_s){
-            .data = "Hello,",
-            .length = 6,
-            .id = i++,
-        } : (can_message_s){
-            .data = "world!",
-            .length = 6,
-            .id = i++,
-        };
+        // can_message_s t_message = i%2 ? (can_message_s){
+        //     .data = "Hello,",
+        //     .length = 6,
+        //     .id = i++,
+        // } : (can_message_s){
+        //     .data = "world!",
+        //     .length = 6,
+        //     .id = i++,
+        // };
 
-        can_transmit(&t_message);
+        // can_transmit(&t_message);
 
         can_message_s r_message;
 
@@ -157,7 +157,14 @@ int main(void) {
             printf("Ingen data mottatt :(\r\n");
         }
 
-        _delay_ms(100);
+        _delay_ms(1000);
+
+        printf("%x \r\n", mcp_read(0x30));
+        // printf("%x \r\n", mcp_read_status());
+
+
+
+
     }
 
 

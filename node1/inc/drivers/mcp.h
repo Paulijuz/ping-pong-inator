@@ -30,6 +30,8 @@
 #define MCP_CANCTRL_REQOP_MASK      0b11100000
 #define MCP_CANCTRL_REQOP_NORMAL   (0b000 << 5)
 #define MCP_CANCTRL_REQOP_LOOPBACK (0b010 << 5)
+#define MCP_CANCTRL_OSM_MASK        0b00001000
+#define MCP_CANCTRL_OSM                      3
 
 #define MCP_CANINTF             0b00101100
 #define MCP_CANINTF_RX0IF       0
