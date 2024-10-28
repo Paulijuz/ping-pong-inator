@@ -21,7 +21,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
 /**
  * @brief Joystick calibration values
  *
@@ -29,10 +28,24 @@
 #define JOY_MIN           -128
 #define JOY_MAX           127
 #define JOY_CENTER        0
-#define JOY_DEADZONE      0
 
+/**
+ * @brief Deadzone for joystick
+ *
+ */
+#define JOY_DEADZONE_X 0
+#define JOY_DEADZONE_Y 50 // Larger because Y is used for menu
+
+/**
+ * @brief Delay for calibration
+ *
+ */
 #define CALIBRATION_DELAY 1500 // ms, delay between calibration steps (for human interaction)
 
+/**
+ * @brief Enum for joystick initialization state
+ *
+ */
 typedef enum JOYSTICK_INITIALIZATION_STATE {
     JOYSTICK_NO_CALIBRATE,
     JOYSTICK_USE_DEFAULT_CALIBRATION,
@@ -40,6 +53,10 @@ typedef enum JOYSTICK_INITIALIZATION_STATE {
 } e_JOYSTICK_INITIALIZATION_STATE;
 
 // clang-format off
+/**
+ * @brief Enum for joystick direction
+ *
+ */
 typedef enum JOYSTICK_DIR {
     JOYSTICK_CENTER,
     JOYSTICK_UP,

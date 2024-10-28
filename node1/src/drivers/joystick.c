@@ -118,8 +118,13 @@ joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
     joystick_t position = joystick_read_raw();
     int8_t     x_adjusted = joystick_adjust(position.raw_x, config->x_config);
     int8_t     y_adjusted = joystick_adjust(position.raw_y, config->y_config);
-    if (pow(x_adjusted, 2) + pow(y_adjusted, 2) < pow(JOY_DEADZONE, 2)) {
-        return position; // X, Y are default 0
+
+    // X-deadzone
+    if (pow(x_adjusted, 2) < pow(JOY_DEADZONE_X, 2)) {
+        x_adjusted = 0;
+    }
+    if (pow(y_adjusted, 2) < pow(JOY_DEADZONE_Y, 2)) {
+        y_adjusted = 0;
     }
 
     position.x = x_adjusted;
@@ -133,6 +138,7 @@ joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
         if (position.y > 0) position.dir = JOYSTICK_UP;
         else                position.dir = JOYSTICK_DOWN;
     }
+    if (position.x == 0 && position.y == 0) position.dir = JOYSTICK_CENTER;
     // clang-format on
 
     position.dir_changed = prev_dir != position.dir;
