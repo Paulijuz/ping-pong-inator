@@ -42,8 +42,8 @@ void joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE st
 void joystick_calibrate_axis(e_JOYSTICK_DIR axis, joystick_config_t *config) {
     const char *axis_names[5];
     axis_names[JOYSTICK_CENTER] = "center";
-    axis_names[JOYSTICK_UP]    = "top";
-    axis_names[JOYSTICK_DOWN] = "bottom";
+    axis_names[JOYSTICK_UP]     = "top";
+    axis_names[JOYSTICK_DOWN]   = "bottom";
     axis_names[JOYSTICK_RIGHT]  = "right";
     axis_names[JOYSTICK_LEFT]   = "left";
 

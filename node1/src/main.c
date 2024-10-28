@@ -99,11 +99,11 @@ int main(void) {
         }
 
         // Transmit CAN message
-        static uint8_t can_id    = 0;
-        can_message_s  t_message = {
-           .data   = {joystick.x, joystick.y},
-           .length = 2,
-           .id     = can_id++,
+        // static uint8_t can_id    = 0;
+        can_message_s t_message = {
+          .data   = {joystick.x, joystick.y},
+          .length = 2,
+          .id     = 1000,
         };
         can_transmit(&t_message);
 
@@ -115,10 +115,6 @@ int main(void) {
         } else {
             printf("Ingen data mottatt :(\r\n");
         }
-
-        // What the fuck does this do
-        printf("%x \r\n", mcp_read(0x30));
-        // printf("%x \r\n", mcp_read_status())
 
         // Delay to prevent spamming
         _delay_ms(10);

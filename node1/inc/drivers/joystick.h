@@ -26,13 +26,12 @@
  * @brief Joystick calibration values
  *
  */
-#define JOY_MIN    -128
-#define JOY_MAX    127
-#define JOY_CENTER 0
+#define JOY_MIN           -128
+#define JOY_MAX           127
+#define JOY_CENTER        0
+#define JOY_DEADZONE      0
 
 #define CALIBRATION_DELAY 1500 // ms, delay between calibration steps (for human interaction)
-
-#define JOY_DEADZONE 50
 
 typedef enum JOYSTICK_INITIALIZATION_STATE {
     JOYSTICK_NO_CALIBRATE,
