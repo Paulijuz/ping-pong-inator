@@ -17,7 +17,7 @@
 #define PWM_PERIOD 13125
 
 
-void pwm_init();
+void pwm_init(float initial_duty_cycle);
 void pwm_set_duty_cycle(float duty_cycle);
 
 

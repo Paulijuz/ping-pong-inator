@@ -16,8 +16,6 @@ int main() {
 
     pwm_init(PWM_DUTY_MIN);
 
-    pwm_init(PWM_DUTY_MIN);
-
     // Disable Watchdog Timer
     WDT->WDT_MR = WDT_MR_WDDIS;
 
@@ -35,6 +33,7 @@ int main() {
         printf("CAN initialization successful\n\r");
     }
 
+    int i = 0;
     while (1) {
         CAN0_Handler();
 
