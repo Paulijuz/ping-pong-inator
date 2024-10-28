@@ -8,12 +8,13 @@
  *
  */
 
-#include "can_interrupt.h"
 
 #include <stdio.h>
-#include "sam.h"
 
+#include "sam.h"
+#include "can_interrupt.h"
 #include "can_controller.h"
+#include "servo.h"
 
 #define DEBUG_RX_INTERRUPT 1
 #define DEBUG_TX_INTERRUPT 0
@@ -65,9 +66,14 @@ void CAN0_Handler(void) {
         printf("message too long, id: %d\n\r", message.id);
       }
       for (int i = 0; i < message.data_length; i++) {
-        printf("%d ", (uint8_t)message.data[i]);
+        printf("%d ", *((int8_t *)&message.data[i]));
       }
       printf("\n\r");
+    }
+
+    if (message.id == 1000) {
+      float pos = *((int8_t *)&message.data[0]) + 128;
+      servo_set_pos(pos/255);
     }
   }
 

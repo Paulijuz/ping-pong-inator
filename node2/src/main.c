@@ -33,7 +33,7 @@ int main() {
         printf("CAN initialization successful\n\r");
     }
 
-    int i = 0;
+    // int i = 0;
     while (1) {
         CAN0_Handler();
 
@@ -48,9 +48,9 @@ int main() {
         // time_spinFor(msecs(1));
 
       
-      servo_set_pos((i%100)/100.0f);
-      i++;
+    //   servo_set_pos((i%100)/100.0f);
+    //   i++;
 
-      time_spinFor(msecs(20));
+      time_spinFor(msecs(10));
     }
 }
