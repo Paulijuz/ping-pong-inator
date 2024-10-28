@@ -24,7 +24,6 @@ uint8_t mcp_read(uint8_t address) {
     uint8_t data = spi_master_receive();
     spi_disable_slave();
     return data;
-
 }
 
 // void mcp_read_rx_buffer(uint8_t buffer, uint8_t* data, int length) {

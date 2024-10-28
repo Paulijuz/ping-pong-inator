@@ -118,8 +118,9 @@ joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
     joystick_t position = joystick_read_raw();
     int8_t     x_adjusted = joystick_adjust(position.raw_x, config->x_config);
     int8_t     y_adjusted = joystick_adjust(position.raw_y, config->y_config);
-    if (pow(x_adjusted, 2) + pow(y_adjusted, 2) < pow(JOY_DEADZONE, 2))
+    if (pow(x_adjusted, 2) + pow(y_adjusted, 2) < pow(JOY_DEADZONE, 2)) {
         return position; // X, Y are default 0
+    }
 
     position.x = x_adjusted;
     position.y = y_adjusted;

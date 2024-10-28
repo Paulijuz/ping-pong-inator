@@ -16,30 +16,25 @@
 #include <avr/io.h>
 
 void spi_init_master(void) {
-    /* Set MOSI and SCK output, all others input */
-    DDRB |= (1 << DDB5) | (1 << DDB7) | (1 << DDB4);
-    /* Enable SPI, Master, set clock rate fck/16 */
-    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+    DDRB |= (1 << DDB5) | (1 << DDB7) | (1 << DDB4); // Set MOSI and SCK output, all others input
+    SPCR  = (1 << SPE)  | (1 << MSTR) | (1 << SPR0); // Enable SPI, Master, set clock rate fck/16
 
     spi_disable_slave();
 }
 void spi_master_transmit(char data) {
-    /* Start transmission */
-
+    // Start transmission
     SPDR = data;
 
-    /* Wait for transmission complete */
+    // Wait for transmission complete
     while (!(SPSR & (1 << SPIF))) {
-    };
+        // pass
+    }
 }
 
 char spi_master_receive(void) {
-
     spi_master_transmit(0x00);
-
     return SPDR;
 }
-
 
 void spi_enable_slave(void) {
     PORTB &= ~(1 << PORTB4);

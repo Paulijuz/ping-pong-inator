@@ -29,13 +29,17 @@
 #include "drivers/can.h"
 #include "fonts.h"
 
+// Something something assignment with a filter
 // Cutoff frequency of filter: 795 Hz
-// Slope: 20 dB per decade
-int main(void) {
-    cli();
+//            Slope of filter: 20 dB per decade
 
-    // Initialize SRAM
-    sram_init();
+/**
+ * @brief Main function
+ *
+ * @return int
+ */
+int main(void) {
+    cli(); // Prevent interrupts during initialization
 
     // Initialize UART
     uart_init(9600);
@@ -44,12 +48,15 @@ int main(void) {
     // Program startup
     printf("\r\n--- Program startup ---\r\n");
 
+    // Initialize SRAM
+    sram_init();
+    printf("SRAM initialized\r\n");
+
     // Initialize ADC
     adc_init();
     printf("ADC initialized\r\n");
 
     // Joystick calibration and configuration
-    // If default values are desired, they are here:
     joystick_config_t joystick_calibration_config;
     joystick_init(&joystick_calibration_config, JOYSTICK_USE_DEFAULT_CALIBRATION);
     printf("Joystick initialized\r\n");
@@ -60,59 +67,29 @@ int main(void) {
     // Initialize OLED
     oled_init();
     printf("OLED initialized\r\n");
-
-    // Decide on font
-    font_config_t font_config = FONT5_CONFIG;
+    font_config_t font_config = FONT5_CONFIG; // Decide on font
     oled_set_font(&font_config);
     oled_clear_screen();
-    sei();
-
-    joystick_t joystick = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
 
     // Initialize SPI
     spi_init_master();
+    printf("SPI initialized\r\n");
+
+    // Initialize CAN
     can_init();
+    printf("CAN initialized\r\n");
 
-    int i = 0;
+    // Enable interrupts
+    sei();
+
+    joystick_t joystick; // = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
     while (1) {
-        // // Read and print joystick position (both calibrated and raw values)
-        // joystick_t joy = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
-        // printf("Joystick: %03d, %03d | %03d, %03d, %d\r\n", joy.x, joy.y, joy.raw_x, joy.raw_y, joy.dir);
-
-        // Chip-select test for OLED
-        // volatile uint8_t *base = (uint8_t *)0x1000;
-        // volatile uint8_t *end  = (uint8_t *)0x1600;
-        // for (volatile uint8_t *addr = base; addr < end; addr += 4) {
-        //     *addr = 0xFF;
-        //     printf("Wrote 0xFF to address %p\r\n", addr);
-        // }
-
-        // Data test for OLED
-        // volatile uint8_t *base = (uint8_t *)0x1200;
-        // *base                  = 0xFF;
-
-        // Char test for OLED
-        // char c = uart_receive_char();
-        // if (c == 13 ) {
-        //     oled_clear_line(oled_get_line());
-        // } else {
-        //     oled_print_char(c);
-        // }
-        // oled_flip_buffer();
-        // oled_print_string("Hello, world!  ");
-        // _delay_ms(15);
-
-
-
-        //List test for Menu
-
-
+        // Read joystick
         joystick = joystick_read(&joystick_calibration_config, joystick.dir);
-        
+
+        // Navigating menu
         menu_move_arrow(joystick);
-
         oled_clear_screen();
-
         menu_draw_list();
 
         // Switch buffers that are drawn
@@ -121,39 +98,30 @@ int main(void) {
             oled_flush_buffer();
         }
 
-        //Test SPI
-
-        // spi_enable_slave();
-        // spi_master_transmit(0b00000011);
-        // spi_master_transmit(i);
-        // char data1 = spi_master_receive();
-
-        // printf("%.2X \r \n", data1);
-
-        // spi_disable_slave();
-        // i++;
-        // _delay_ms(10);
-
-        can_message_s t_message = {
-            .data = { joystick.x, joystick.y },
-            .length = 2,
-            .id = 0,
+        // Transmit CAN message
+        static uint8_t can_id    = 0;
+        can_message_s  t_message = {
+           .data   = {joystick.x, joystick.y},
+           .length = 2,
+           .id     = can_id++,
         };
-
         can_transmit(&t_message);
 
+        // Receive CAN message
         can_message_s r_message;
-
-        if (can_receive(&r_message)) {
+        bool          can_receive_status = can_receive(&r_message);
+        if (can_receive_status) {
             printf("%u: %s \r\n", r_message.id, r_message.data);
         } else {
             printf("Ingen data mottatt :(\r\n");
         }
 
-        _delay_ms(10);
-
+        // What the fuck does this do
         printf("%x \r\n", mcp_read(0x30));
         // printf("%x \r\n", mcp_read_status())
+
+        // Delay to prevent spamming
+        _delay_ms(10);
     }
 
     return 0;
