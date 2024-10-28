@@ -25,9 +25,9 @@
  * @brief Joystick calibration values
  *
  */
-#define JOY_MIN           -128
-#define JOY_MAX           127
-#define JOY_CENTER        0
+#define JOY_MIN    -128
+#define JOY_MAX    127
+#define JOY_CENTER 0
 
 /**
  * @brief Deadzone for joystick
@@ -46,11 +46,7 @@
  * @brief Enum for joystick initialization state
  *
  */
-typedef enum JOYSTICK_INITIALIZATION_STATE {
-    JOYSTICK_NO_CALIBRATE,
-    JOYSTICK_USE_DEFAULT_CALIBRATION,
-    JOYSTICK_CALIBRATE
-} e_JOYSTICK_INITIALIZATION_STATE;
+typedef enum JOYSTICK_INITIALIZATION_STATE { JOYSTICK_NO_CALIBRATE, JOYSTICK_USE_DEFAULT_CALIBRATION, JOYSTICK_CALIBRATE } e_JOYSTICK_INITIALIZATION_STATE;
 
 // clang-format off
 /**
@@ -93,14 +89,14 @@ typedef struct joystick_config_s {
  *
  */
 typedef struct joystick_s {
-    int8_t  x;
-    int8_t  y;
+    int8_t         x;
+    int8_t         y;
 
     e_JOYSTICK_DIR dir;
-    bool dir_changed;
+    bool           dir_changed;
 
-    uint8_t raw_x;
-    uint8_t raw_y;
+    uint8_t        raw_x;
+    uint8_t        raw_y;
 } joystick_t;
 
 void       joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE state);
