@@ -5,7 +5,10 @@
         },
         {
             "path": "../node2"
-        }
+        },
+		{
+			"path": "../"
+		},
     ],
 	"settings": {
 		"files.associations": {
