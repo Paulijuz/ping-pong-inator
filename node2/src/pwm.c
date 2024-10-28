@@ -15,7 +15,7 @@
 
 
 
-void pwm_init() {
+void pwm_init(float initial_duty_cycle) {
     PIOB->PIO_WPMR =  (0x50494F << 8);
     PIOB->PIO_PDR = PIO_PB13;
     PIOB->PIO_OER =  PIO_PB13;
@@ -27,7 +27,7 @@ void pwm_init() {
     PWM->PWM_ENA = PWM_SR_CHID1;
     PWM->PWM_CH_NUM[1].PWM_CMR = PWM_CMR_CPRE_MCK_DIV_128 | PWM_CMR_CPOL;
     PWM->PWM_CH_NUM[1].PWM_CPRD = PWM_PERIOD;
-    PWM->PWM_CH_NUM[1].PWM_CDTY = 0; // FIX LATER 
+    PWM->PWM_CH_NUM[1].PWM_CDTY = initial_duty_cycle; // FIX LATER 
 
 
 }

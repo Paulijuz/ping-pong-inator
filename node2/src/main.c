@@ -6,6 +6,7 @@
 #include "can_controller.h"
 #include "time.h"
 #include "pwm.h"
+#include "servo.h"
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 // #include "uart.h"
@@ -13,8 +14,13 @@
 int main() {
     SystemInit();
 
+    pwm_init(PWM_DUTY_MIN);
+
+    pwm_init(PWM_DUTY_MIN);
+
     // Disable Watchdog Timer
     WDT->WDT_MR = WDT_MR_WDDIS;
+
 
     // Initialize UART
     uart_init(F_CPU, 9600);
@@ -41,5 +47,11 @@ int main() {
         // };
         // can_send(&can_msg, 0);
         // time_spinFor(msecs(1));
+
+      
+      servo_set_pos((i%100)/100.0f);
+      i++;
+
+      time_spinFor(msecs(20));
     }
 }
