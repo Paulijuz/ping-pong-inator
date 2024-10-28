@@ -5,6 +5,7 @@
 
 #include "can_controller.h"
 #include "time.h"
+#include "pwm.h"
 
 //Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 //#include "uart.h"
