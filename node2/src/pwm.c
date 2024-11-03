@@ -16,12 +16,12 @@
 
 
 void pwm_init(float initial_duty_cycle) {
-    PIOB->PIO_WPMR =  (0x50494F << 8);
-    PIOB->PIO_PDR = PIO_PB13;
-    PIOB->PIO_OER =  PIO_PB13;
-    PIOB->PIO_ABSR =  PIO_PB13;
+    PIOB->PIO_WPMR = (0x50494F << 8);
+    PIOB->PIO_PDR |= PIO_PB13;
+    PIOB->PIO_OER |=  PIO_PB13;
+    PIOB->PIO_ABSR |=  PIO_PB13;
 
-    PMC-> PMC_PCR = PMC_PCR_EN | PMC_PCR_CMD | PMC_PCR_PID(ID_PWM);
+    PMC-> PMC_PCR |= PMC_PCR_EN | PMC_PCR_CMD | PMC_PCR_PID(ID_PWM);
 
     PWM->PWM_WPCR = (0x50574D << 8);
     PWM->PWM_ENA = PWM_SR_CHID1;

@@ -12,8 +12,6 @@
 #ifndef PWM_H
 #define PWM_H
 
-#define PWM_DUTY_MIN 591
-#define PWM_DUTY_MAX 1378
 #define PWM_PERIOD 13125
 
 
