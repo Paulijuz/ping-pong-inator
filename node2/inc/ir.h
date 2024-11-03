@@ -13,6 +13,12 @@
 #ifndef IR_H
 #define IR_H
 
-void init_ir();
+#include <stdbool.h>
+
+#define IR_HIT_THREASHOLD 1024
+#define IR_HIT_COUNT_MAX 5
+
+void ir_init();
+bool ir_hit();
 
 #endif // IR_H

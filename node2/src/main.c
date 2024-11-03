@@ -7,6 +7,7 @@
 #include "time.h"
 #include "pwm.h"
 #include "servo.h"
+#include "ir.h"
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 // #include "uart.h"
@@ -24,6 +25,8 @@ int main() {
     uart_init(F_CPU, 9600);
     printf("UART initialized\n\r");
 
+    ir_init();
+
     // Initialize CAN
     uint32_t can_br = 0x01293165; // This was calculated by hand
     uint8_t  status = can_init_default_tx_rx_mb(can_br);
@@ -33,7 +36,8 @@ int main() {
         printf("CAN initialization successful\n\r");
     }
 
-    // int i = 0;
+    int i = 0;
+    bool prev_hit = false;
     while (1) {
         CAN0_Handler();
 
@@ -48,9 +52,15 @@ int main() {
         // time_spinFor(msecs(1));
 
       
-    //   servo_set_pos((i%100)/100.0f);
-    //   i++;
+        //   servo_set_pos((i%100)/100.0f);
+        bool hit = ir_hit();
+        
+        if (!prev_hit && hit) {
+            i++;
+            printf("IR hit count: %d\r\n", i);
+        }
 
-      time_spinFor(msecs(10));
+        prev_hit = hit;
+        time_spinFor(msecs(10));
     }
 }

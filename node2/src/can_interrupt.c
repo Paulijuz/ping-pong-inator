@@ -60,15 +60,15 @@ void CAN0_Handler(void) {
     }
 
     if (DEBUG_RX_INTERRUPT) {
-      printf("ID: %d -> ", message.id);
+      // printf("ID: %d -> ", message.id);
       // printf("%d -> ", message.data_length);
       if (message.data_length > 2) {
         printf("message too long, id: %d\n\r", message.id);
       }
       for (int i = 0; i < message.data_length; i++) {
-        printf("%d ", *((int8_t *)&message.data[i]));
+        // printf("%d ", *((int8_t *)&message.data[i]));
       }
-      printf("\n\r");
+      // printf("\n\r");
     }
 
     if (message.id == 1000) {
