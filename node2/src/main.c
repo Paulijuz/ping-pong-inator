@@ -9,6 +9,7 @@
 #include "motor.h"
 #include "servo.h"
 #include "ir.h"
+#include "timer_counter.h"
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 // #include "uart.h"
@@ -28,6 +29,7 @@ int main() {
     printf("UART initialized\n\r");
 
     ir_init();
+    timer_counter_init();
 
     // Initialize CAN
     uint32_t can_br = 0x01293165; // This was calculated by hand
@@ -55,6 +57,10 @@ int main() {
 
       
         //   servo_set_pos((i%100)/100.0f);
+        // read_encoder();
+        // printf("Motor pos: %d \r\n", tc_read_motor_pos());
+        // printf("Motor revolutions: %d \r\n", tc_read_motor_rev());
+        // tc_read_status();
         bool hit = ir_hit();
         
         if (!prev_hit && hit) {
