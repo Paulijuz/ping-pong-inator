@@ -212,7 +212,7 @@ void oled_cursor_increment() {
  *
  * @param str
  */
-void oled_print_string(char *str) {
+void oled_print_string(const char *str) {
     while (*str) {
         oled_print_char(*str++);
     }
