@@ -27,6 +27,9 @@ ContinuationIndentWidth: 2
 # Includes
 SortIncludes: false
 
+# Merging onto a single line
+AllowShortEnumsOnASingleLine: false # https://clang.llvm.org/docs/ClangFormatStyleOptions.html#allowshortblocksonasingleline
+
 # [cpp]
 PackConstructorInitializers: Never
 BreakConstructorInitializers: BeforeComma
