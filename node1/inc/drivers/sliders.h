@@ -17,6 +17,7 @@
 #include <stdio.h>
 
 #include "drivers/adc.h"
+#include "logger.h"
 
 #define SLIDER_CALIBRATION_DELAY 1500 // ms, delay between calibration steps (for human interaction
 

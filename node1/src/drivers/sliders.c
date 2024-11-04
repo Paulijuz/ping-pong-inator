@@ -42,7 +42,7 @@ void slider_init(slider_config_t *config, e_SLIDER_INITIALIZATION_STATE state) {
  *
  */
 void slider_calibrate(slider_config_t *config) {
-    printf("\r\n--- Slider calibration ---\r\n");
+    log_info("Slider calibration");
 
     // Slider calibration
     slider_calibrate_axis(0, SLIDER_LEFT, config);
@@ -62,9 +62,9 @@ void slider_calibrate(slider_config_t *config) {
         config->x2_calibration[0] = temp;
     }
 
-    printf("\r\n--- Calibration complete ---\r\n");
-    printf("Slider 1: %u/%u\r\n", config->x1_calibration[0], config->x1_calibration[1]);
-    printf("Slider 2: %u/%u\r\n", config->x2_calibration[0], config->x2_calibration[1]);
+    log_info("Slider calibration complete");
+    log_info("Slider 1: %u/%u", config->x1_calibration[0], config->x1_calibration[1]);
+    log_info("Slider 2: %u/%u", config->x2_calibration[0], config->x2_calibration[1]);
     _delay_ms(SLIDER_CALIBRATION_DELAY);
     config->calibrated = true;
 }
@@ -80,10 +80,10 @@ void slider_calibrate_axis(uint8_t slider, e_SLIDER_DIR dir, slider_config_t *co
     directions[SLIDER_LEFT]  = "left";
     directions[SLIDER_RIGHT] = "right";
 
-    printf("Move slider %u %s\r\n", slider, directions[dir]);
+    log_info("Move slider %u %s", slider, directions[dir]);
     _delay_ms(SLIDER_CALIBRATION_DELAY);
-    printf("Calibrating...\r\n");
-    uint8_t calx = 0;
+    log_info("Calibrating...");
+    uint16_t calx = 0;
     for (int i = 0; i < 100; ++i) {
         slider_t slider_values = slider_read_raw();
         if (slider == 1) {
