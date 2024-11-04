@@ -11,11 +11,17 @@
 
 #ifndef CAN_INTERRUPT_H_
 #define CAN_INTERRUPT_H_
-void CAN0_Handler       ( void );
 
+#include "can_controller.h"
 
+#define CAN_HANDLER_BUFFER_SIZE 20
 
+typedef struct can_handler_buffer_entry_s {
+    int id;
+    void (*handler)(CAN_MESSAGE*);
+} can_handler_buffer_entry_t;
 
-
+void CAN0_Handler(void);
+int can_register_handler(int id, void (*handler)(CAN_MESSAGE*));
 
 #endif /* CAN_INTERRUPT_H_ */

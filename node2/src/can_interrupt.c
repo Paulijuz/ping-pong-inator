@@ -13,13 +13,12 @@
 #include "sam.h"
 #include "can_interrupt.h"
 #include "can_controller.h"
-#include "motor.h"
-#include "servo.h"
-#include "solenoid.h"
 
 #define DEBUG_RX_INTERRUPT 1
 #define DEBUG_TX_INTERRUPT 0
 #define DEBUG_BUS_ERROR    0
+
+can_handler_buffer_entry_t can_handler_buffer[CAN_HANDLER_BUFFER_SIZE] = {0};
 
 /**
  * \brief CAN0 Interrupt handler for RX, TX and bus error interrupts
@@ -72,14 +71,10 @@ void CAN0_Handler(void) {
             printf("\n\r");
         }
 
-        if (message.id == 500) {
-            solenoid_fire();
-        }
+        for (int i = 0; i < CAN_HANDLER_BUFFER_SIZE; i++) {
+            if (message.id != can_handler_buffer[i].id || !can_handler_buffer[i].handler) continue;
 
-        if (message.id == 1000) {
-            float pos = *((int8_t *)&message.data[0]);
-            servo_set_pos((pos+128)/255);
-            motor_set_speed(pos/255);
+            can_handler_buffer[i].handler(&message);
         }
     }
 
@@ -109,4 +104,17 @@ void CAN0_Handler(void) {
     // sei();
     // __enable_irq();
     // NVIC_EnableIRQ(ID_CAN0);
+}
+
+int can_register_handler(int id, void (*handler)(CAN_MESSAGE*)) {
+    for (int i = 0; i < CAN_HANDLER_BUFFER_SIZE; i++) {
+        if (can_handler_buffer[i].handler) continue;
+        
+        can_handler_buffer[i].id      = id;
+        can_handler_buffer[i].handler = handler;
+
+        return id;
+    }
+
+    return -1;
 }

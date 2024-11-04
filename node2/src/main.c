@@ -4,6 +4,7 @@
 #include "sam.h"
 
 #include "can_controller.h"
+#include "can_interrupt.h"
 #include "time.h"
 #include "pwm.h"
 #include "motor.h"
@@ -14,6 +15,16 @@
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 // #include "uart.h"
+
+void solenoid_fire_handler(CAN_MESSAGE* message) {
+    solenoid_fire();
+}
+
+void motor_speed_handler(CAN_MESSAGE* message) {
+    float pos = *((int8_t *)&message->data[0]);
+    servo_set_pos((pos+128)/255);
+    motor_set_speed(pos/255);
+}
 
 int main() {
     SystemInit();
@@ -34,12 +45,14 @@ int main() {
         printf("CAN initialization successful\n\r");
     }
 
-
     servo_init();
     motor_init();
     decoder_init();
     solenoid_init();
     ir_init();
+
+    can_register_handler(500, solenoid_fire_handler);
+    can_register_handler(2000, motor_speed_handler);
 
     int i = 0;
     bool prev_hit = false;
