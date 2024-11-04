@@ -183,7 +183,7 @@ void fsm_game(void) {
     can_message_s t_message = {
       .data   = {joystick.x, joystick.y},
       .length = 2,
-      .id     = 1000, // TODO: Move ID to enum
+      .id     = CAN_ID_JOYSTICK,
     };
     can_transmit(&t_message);
 

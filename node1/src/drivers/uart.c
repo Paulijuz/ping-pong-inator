@@ -31,7 +31,7 @@ void uart_init(unsigned int baud_rate) {
              (1 << TXEN0);  // Enable TX.
 
     //  (1 << RXCIE0); // Enable RX interrupt.
-    //   (1 << TXCIE0); // Enable TX interrupt.
+    //  (1 << TXCIE0); // Enable TX interrupt.
 
     // Set frame format.
     UCSR0C = (1 << URSEL0) | // Enable read/write for UCSRC and disable read/write for UBRRH.

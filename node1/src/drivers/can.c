@@ -14,6 +14,10 @@
 
 #include <stdio.h>
 
+/**
+ * @brief Initializes the CAN controller
+ *
+ */
 void can_init(void) {
     mcp_reset();
 
@@ -27,6 +31,11 @@ void can_init(void) {
 
 }
 
+/**
+ * @brief Transmit a CAN message
+ *
+ * @param message A struct containing the message to be transmitted
+ */
 void can_transmit(can_message_s* message) {
     mcp_write(MCP_TXB0DLC, message->length);
 
@@ -40,6 +49,12 @@ void can_transmit(can_message_s* message) {
     mcp_request_to_send(1);
 }
 
+/**
+ * @brief Receive a CAN message
+ *
+ * @param message The struct to store the received message in
+ * @return True if a message was received, false otherwise
+ */
 bool can_receive(can_message_s* message) {
     if (!(mcp_read_status() & (1 << MCP_CANINTF_RX0IF))) return false;
 
