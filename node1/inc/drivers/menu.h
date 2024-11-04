@@ -13,35 +13,45 @@
 #define MENU_H
 
 #include <stdint.h>
-#include "drivers/joystick.h"
+
+// #include "drivers/joystick.h"
+#include "drivers/oled.h"
+#include "drivers/button.h"
+#include "fsm.h"
+
+typedef enum e_MENU_OPTION_TYPE {
+    MENU_NEXT_PAGE,
+    MENU_EXECUTE_FUNCTION,
+} e_MENU_OPTION_TYPE;
 
 /**
  * @brief Menu string struct
  *
  */
-typedef struct draw_string_s {
+typedef struct menu_option_s {
     char* string;
-    uint8_t line;
+    // uint8_t line;
     uint16_t column;
+
     struct menu_page_s *next_page;
-} draw_string_t;
+    void (*execution_function)(void);
+} menu_option_t;
 
 /**
  * @brief Menu page struct
  *
  */
 typedef struct menu_page_s {
-    draw_string_t *list;
+    menu_option_t *list;
     uint8_t        list_length;
 } menu_page_t;
 
-// Menu arrow position
-extern int arrow_pos;
-
-// Current menu screen
-extern menu_page_t *current_page;
-
-void menu_move_arrow(joystick_t joystick_dir);
+void           menu_move_arrow(int dir);
 void menu_draw_list(void);
+menu_option_t *menu_get_selected_option(void);
+void           menu_activate_selection(void);
+
+// Specific menu functions for drawing certain pages
+void menu_draw_calibration(const char *direction, float completion);
 
 #endif

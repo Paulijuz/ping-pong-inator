@@ -28,6 +28,8 @@
 #include "drivers/mcp.h"
 #include "drivers/can.h"
 #include "fonts.h"
+#include "fsm.h"
+#include "logger.h"
 
 // Something something assignment with a filter
 // Cutoff frequency of filter: 795 Hz
@@ -46,74 +48,52 @@ int main(void) {
     uart_enable_printf();
 
     // Program startup
-    printf("\r\n--- Program startup ---\r\n");
+    printf("\r\n");
+    log_info("Program startup");
 
     // Initialize SRAM
     sram_init();
-    printf("SRAM initialized\r\n");
+    log_info("SRAM initialized");
 
     // Initialize ADC
     adc_init();
-    printf("ADC initialized\r\n");
-
-    // Joystick calibration and configuration
-    joystick_config_t joystick_calibration_config;
-    joystick_init(&joystick_calibration_config, JOYSTICK_USE_DEFAULT_CALIBRATION);
-    printf("Joystick initialized\r\n");
-    if (!joystick_calibration_config.calibrated) { // Calibrate joystick if not already done
-        joystick_calibrate(&joystick_calibration_config);
-    }
+    log_info("ADC initialized");
 
     // Initialize OLED
     oled_init();
-    printf("OLED initialized\r\n");
+    log_info("OLED initialized");
     font_config_t font_config = FONT5_CONFIG; // Decide on font
     oled_set_font(&font_config);
+    log_info("Font set");
     oled_clear_screen();
 
     // Initialize SPI
     spi_init_master();
-    printf("SPI initialized\r\n");
+    log_info("SPI initialized");
 
     // Initialize CAN
     can_init();
-    printf("CAN initialized\r\n");
+    log_info("CAN initialized");
 
-    // Enable interrupts
+    // Reenable interrupts
     sei();
 
-    joystick_t joystick; // = joystick_read(&joystick_calibration_config, JOYSTICK_CENTER);
-    while (1) {
-        // Read joystick
-        joystick = joystick_read(&joystick_calibration_config, joystick.dir);
+    // Joystick calibration and configuration
+    joystick_init(JOYSTICK_USE_DEFAULT_CALIBRATION);
+    log_info("Joystick initialized");
 
-        // Navigating menu
-        menu_move_arrow(joystick);
+    // Continuous operation
+    while (1) {
+        // OLED stuff
         oled_clear_screen();
-        menu_draw_list();
+
+        // FSM
+        fsm();
 
         // Switch buffers that are drawn
         if (oled_should_flush()) {
             oled_flip_buffer();
             oled_flush_buffer();
-        }
-
-        // Transmit CAN message
-        // static uint8_t can_id    = 0;
-        can_message_s t_message = {
-          .data   = {joystick.x, joystick.y},
-          .length = 2,
-          .id     = 1000,
-        };
-        can_transmit(&t_message);
-
-        // Receive CAN message
-        can_message_s r_message;
-        bool          can_receive_status = can_receive(&r_message);
-        if (can_receive_status) {
-            printf("%u: %s \r\n", r_message.id, r_message.data);
-        } else {
-            printf("Ingen data mottatt :(\r\n");
         }
 
         // Delay to prevent spamming

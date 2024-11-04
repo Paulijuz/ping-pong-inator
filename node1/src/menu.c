@@ -9,55 +9,66 @@
  * 
  */
 
-
-
-#include "drivers/oled.h"
 #include "drivers/menu.h"
-#include "drivers/button.h"
+
+/*****************************************************************************/
+/* Local variables                                                           */
+/*****************************************************************************/
 
 // Declarations so we can use them in the menu
-draw_string_t main_menu_list[];
-draw_string_t options_menu_list[];
-draw_string_t menu_404_list[];
-draw_string_t exit_list[];
+menu_option_t main_menu_list[];
+menu_option_t options_menu_list[];
+menu_option_t menu_404_list[];
+menu_option_t exit_list[];
 menu_page_t   menu_main_page;
 menu_page_t   menu_options_page;
 menu_page_t   menu_404_page;
 menu_page_t   menu_exit_page;
 
+#define MENU_LEFT  OLED_WIDTH_PIXELS / 2 - 4 * 4
+#define ARROW_LEFT OLED_WIDTH_PIXELS / 2 - 4 * 6
+
 // Main menu
-draw_string_t main_menu_list[] = {
-  {"START",   2, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_404_page    },
-  {"OPTIONS", 4, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_options_page},
-  {"EXIT",    6, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_exit_page   }
+menu_option_t main_menu_list[] = {
+  {"START",   MENU_LEFT, NULL,               fsm_goto_game},
+  {"OPTIONS", MENU_LEFT, &menu_options_page, NULL         },
+  {"EXIT",    MENU_LEFT, &menu_exit_page,    NULL         },
 };
 menu_page_t menu_main_page = {main_menu_list, 3};
 
 // Options
-draw_string_t options_menu_list[] = {
-  {"CALIBRATE",  2, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_404_page },
-  {"BRIGHTNESS", 4, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_404_page },
-  {"BACK",       6, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_main_page}
+menu_option_t options_menu_list[] = {
+  {"CALIBRATE",  MENU_LEFT, NULL,            fsm_goto_calibration},
+  {"BRIGHTNESS", MENU_LEFT, &menu_404_page,  NULL                },
+  {"BACK",       MENU_LEFT, &menu_main_page, NULL                }
 };
 menu_page_t menu_options_page = {options_menu_list, 3};
 
 // 404 - Not found
-draw_string_t menu_404_list[] = {
-  {"404 :(", 2, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_404_page },
-  {"BACK",   6, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_main_page}
+menu_option_t menu_404_list[] = {
+  {"404 :(", MENU_LEFT, &menu_404_page,  NULL},
+  {"BACK",   MENU_LEFT, &menu_main_page, NULL}
 };
 menu_page_t menu_404_page = {menu_404_list, 2};
 
 // Exit
-draw_string_t exit_list[] = {
-  {"BYE",  2, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_exit_page},
-  {"BACK", 6, OLED_WIDTH_PIXELS / 2 - 4 * 4, &menu_main_page}
+menu_option_t exit_list[] = {
+  {"BYE",  MENU_LEFT, &menu_exit_page, NULL},
+  {"BACK", MENU_LEFT, &menu_main_page, NULL}
 };
 menu_page_t menu_exit_page = {exit_list, 2};
 
 // Current menu screen
-int arrow_pos = 0;
-menu_page_t *current_page = &menu_main_page;
+static int          arrow_pos    = 0;
+static menu_page_t *current_page = &menu_main_page;
+
+/*****************************************************************************/
+/* Local function declarations                                               */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* Function definitions                                                      */
+/*****************************************************************************/
 
 /**
  * @brief
@@ -67,14 +78,10 @@ menu_page_t *current_page = &menu_main_page;
  *
  * @param joystick_dir
  */
-void menu_move_arrow(joystick_t joystick_dir) {
-    bool    joy_up   = (joystick_dir.dir == JOYSTICK_UP && joystick_dir.dir_changed);
-    bool    joy_down = (joystick_dir.dir == JOYSTICK_DOWN && joystick_dir.dir_changed);
-    int8_t  dir      = joy_up - joy_down;
-
+void menu_move_arrow(int dir) {
     uint8_t menu_page_length = current_page->list_length;
 
-    arrow_pos -= dir;
+    arrow_pos += dir;
     if (arrow_pos < 0) {
         arrow_pos = menu_page_length - 1;
     } else if (arrow_pos >= menu_page_length) {
@@ -88,25 +95,70 @@ void menu_move_arrow(joystick_t joystick_dir) {
  *
  * @param list_length
  */
-void menu_draw_list() {
-    // Move between pages
-    if (button_right_pressed()) {
-        draw_string_t *selected_option = &current_page->list[arrow_pos];
-        printf("%s", selected_option->string);
-        current_page = selected_option->next_page;
-    }
-
+void menu_draw_list(void) {
     // Draw lines
     for (int i = 0; i < current_page->list_length; ++i) {
-        draw_string_t current_option = current_page->list[i];
+        menu_option_t current_option = current_page->list[i];
         oled_goto_column(current_option.column);
-        oled_goto_line(current_option.line);
+        oled_goto_line(i * 2 + 2);
         oled_print_string(current_option.string);
 
         if (i == arrow_pos) {
             // Draw arrow
-            oled_goto_column(OLED_WIDTH_PIXELS / 2 - 4 * 6);
+            oled_goto_column(ARROW_LEFT);
             oled_print_char('>');
         }
+    }
+}
+
+void menu_draw_calibration(const char *direction, float completion) {
+    oled_goto_line(2);
+    oled_goto_column(16);
+    oled_print_string("CALIBRATION");
+
+    oled_goto_line(4);
+    oled_goto_column(16);
+    oled_print_string("Move to ");
+    oled_print_string(direction);
+
+    oled_goto_line(6);
+    oled_goto_column(16);
+    oled_print_string("Progress: ");
+    int    completion_int    = (int)(completion * 100);
+    size_t completion_length = (size_t)((ceil(log10(completion_int)) + 1) * sizeof(char));
+    char   completion_string[completion_length];
+    sprintf(completion_string, "%d", completion_int);
+    oled_print_string(completion_string);
+    oled_print_string("%");
+}
+
+/**
+ * @brief
+ *
+ * @return menu_option_t*
+ */
+menu_option_t *menu_get_selected_option() {
+    // Return current pointed to option
+    return &current_page->list[arrow_pos];
+}
+
+/**
+ * @brief
+ *
+ * @param page
+ */
+void menu_activate_selection() {
+    menu_option_t *option = menu_get_selected_option();
+    if (option->next_page == NULL && option->execution_function == NULL) {
+        return;
+    }
+
+    if (option->next_page == NULL) {
+        // Execute function
+        option->execution_function();
+    } else {
+        // Change page
+        current_page = option->next_page;
+        arrow_pos    = 0;
     }
 }
