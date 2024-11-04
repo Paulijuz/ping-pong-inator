@@ -15,6 +15,7 @@
 #include "can_controller.h"
 #include "motor.h"
 #include "servo.h"
+#include "solenoid.h"
 
 #define DEBUG_RX_INTERRUPT 1
 #define DEBUG_TX_INTERRUPT 0
@@ -71,9 +72,14 @@ void CAN0_Handler(void) {
             printf("\n\r");
         }
 
+        if (message.id == 500) {
+            solenoid_fire();
+        }
+
         if (message.id == 1000) {
-            float pos = *((int8_t *)&message.data[0]) + 128;
-            servo_set_pos(pos / 255);
+            float pos = *((int8_t *)&message.data[0]);
+            servo_set_pos((pos+128)/255);
+            motor_set_speed(pos/255);
         }
     }
 

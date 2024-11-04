@@ -9,5 +9,14 @@
  *
  */
 
+#ifndef SOLENOID_H
+#define SOLENOID_H
+
 #include "sam.h"
 #include "time.h"
+
+void solenoid_init(void);
+
+void solenoid_fire(void);
+
+#endif // SOLENOID_H

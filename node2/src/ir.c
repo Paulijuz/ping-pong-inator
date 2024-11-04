@@ -33,7 +33,3 @@ bool ir_hit() {
 
     return hit_count >= IR_HIT_COUNT_MAX;
 }
-
-int ir_hit_count() {
-
-}

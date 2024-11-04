@@ -9,7 +9,7 @@
 #include "motor.h"
 #include "servo.h"
 #include "ir.h"
-#include "timer_counter.h"
+#include "decoder.h"
 #include "solenoid.h"
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
@@ -18,19 +18,12 @@
 int main() {
     SystemInit();
 
-    servo_init();
-    motor_init();
-
     // Disable Watchdog Timer
     WDT->WDT_MR = WDT_MR_WDDIS;
-
 
     // Initialize UART
     uart_init(F_CPU, 9600);
     printf("UART initialized\n\r");
-
-    ir_init();
-    timer_counter_init();
 
     // Initialize CAN
     uint32_t can_br = 0x01293165; // This was calculated by hand
@@ -41,7 +34,12 @@ int main() {
         printf("CAN initialization successful\n\r");
     }
 
+
+    servo_init();
+    motor_init();
+    decoder_init();
     solenoid_init();
+    ir_init();
 
     int i = 0;
     bool prev_hit = false;
@@ -72,7 +70,6 @@ int main() {
         }
 
         prev_hit = hit;
-        time_spinFor(msecs(1000));
-        solenoid_fire();
+        time_spinFor(msecs(10));
     }
 }
