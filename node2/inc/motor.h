@@ -9,13 +9,10 @@
  * 
  */
 
-#ifndef SERVO_H
-#define SERVO_H
+#ifndef MOTOR_H
+#define MOTOR_H
 
-#define PWM_DUTY_MIN 0.9/20.0f
-#define PWM_DUTY_MAX 2.1/20.0f
+void motor_init();
+void motor_set_speed(float speed);
 
-void servo_init();
-void servo_set_pos(float pos);
-
-#endif // SERVO_H
+#endif // MOTOR_H

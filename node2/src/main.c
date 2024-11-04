@@ -6,6 +6,7 @@
 #include "can_controller.h"
 #include "time.h"
 #include "pwm.h"
+#include "motor.h"
 #include "servo.h"
 #include "ir.h"
 
@@ -15,7 +16,8 @@
 int main() {
     SystemInit();
 
-    pwm_init(PWM_DUTY_MIN);
+    servo_init();
+    motor_init();
 
     // Disable Watchdog Timer
     WDT->WDT_MR = WDT_MR_WDDIS;

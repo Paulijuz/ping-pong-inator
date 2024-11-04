@@ -14,6 +14,7 @@
 #include "sam.h"
 #include "can_interrupt.h"
 #include "can_controller.h"
+#include "motor.h"
 #include "servo.h"
 
 #define DEBUG_RX_INTERRUPT 1
@@ -72,8 +73,9 @@ void CAN0_Handler(void) {
     }
 
     if (message.id == 1000) {
-      float pos = *((int8_t *)&message.data[0]) + 128;
-      servo_set_pos(pos/255);
+      float pos = *((int8_t *)&message.data[0]);
+      motor_set_speed(pos/128);
+      servo_set_pos((pos + 128)/256);
     }
   }
 
