@@ -159,7 +159,7 @@ void fsm_calibration(void) {
             config->calibrated = true;
             current_axis       = 0;
 
-            log_info("Joystick calibrated\r\n");
+            log_info("Joystick calibrated");
             log_info("Joystick X: %u/%u/%u", config->x_config.min, config->x_config.center, config->x_config.max);
             log_info("Joystick Y: %u/%u/%u", config->y_config.min, config->y_config.center, config->y_config.max);
 
