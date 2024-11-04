@@ -11,15 +11,36 @@
 
 #include "drivers/joystick.h"
 
+/*****************************************************************************/
+/* Local variables                                                           */
+/*****************************************************************************/
+
+static joystick_config_t joystick_calibration_config;
+
+/*****************************************************************************/
+/* Function declarations                                                     */
+/*****************************************************************************/
+
+int8_t joystick_adjust(uint8_t value, joystick_config_axis_t axis_config);
+int8_t map_int8(uint8_t val, uint8_t in_min, uint8_t in_max, int8_t out_min, int8_t out_max);
+
+/*****************************************************************************/
+/* Function definitions                                                      */
+/*****************************************************************************/
+
 /**
  * @brief Initialize joystick configuration
  *
  * @param config
  * @param state
  */
-void joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE state) {
+void joystick_init(e_JOYSTICK_INITIALIZATION_STATE state) {
+    joystick_config_t *config = &joystick_calibration_config;
+
     switch (state) {
-    case JOYSTICK_NO_CALIBRATE:
+    case JOYSTICK_ASSUME_IDEAL:
+        config->x_config   = (joystick_config_axis_t){0, 128, 255};
+        config->y_config   = (joystick_config_axis_t){0, 128, 255};
         config->calibrated = true;
         break;
     case JOYSTICK_USE_DEFAULT_CALIBRATION:
@@ -34,77 +55,14 @@ void joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE st
 }
 
 /**
- * @brief Prompt user for single joystick direction calibration
+ * @brief Check if joystick is calibrated
  *
- * @param axis
- * @param config
+ * @return true
+ * @return false
  */
-void joystick_calibrate_axis(e_JOYSTICK_DIR axis, joystick_config_t *config) {
-    const char *axis_names[5];
-    axis_names[JOYSTICK_CENTER] = "center";
-    axis_names[JOYSTICK_UP]     = "top";
-    axis_names[JOYSTICK_DOWN]   = "bottom";
-    axis_names[JOYSTICK_RIGHT]  = "right";
-    axis_names[JOYSTICK_LEFT]   = "left";
-
-    printf("Move to %s\r\n", axis_names[axis]);
-    _delay_ms(CALIBRATION_DELAY);
-    printf("Calibrating...\r\n");
-    uint8_t calx = 0;
-    uint8_t caly = 0;
-    for (int i = 0; i < 100; ++i) {
-        joystick_t joystick = joystick_read_raw();
-        calx += joystick.raw_x;
-        caly += joystick.raw_y;
-        _delay_ms(10);
-    }
-    calx /= 100;
-    caly /= 100;
-
-    if (axis == JOYSTICK_CENTER) {
-        config->x_config.center = calx;
-        config->y_config.center = caly;
-    } else if (axis == JOYSTICK_UP) {
-        config->y_config.max = caly;
-    } else if (axis == JOYSTICK_DOWN) {
-        config->y_config.min = caly;
-    } else if (axis == JOYSTICK_RIGHT) {
-        config->x_config.max = calx;
-    } else if (axis == JOYSTICK_LEFT) {
-        config->x_config.min = calx;
-    }
-}
-
-/**
- * @brief Prompt user for joystick calibration
- *
- * @param config
- */
-void joystick_calibrate(joystick_config_t *config) {
-    printf("\r\n--- Joystick calibration ---\r\n");
-
-    // Perform calibration
-    for (int axis = 0; axis < JOYSTICK_ENUM_LENGTH; ++axis) {
-        joystick_calibrate_axis(axis, config);
-    }
-
-    // Check if max and min are swapped
-    if (config->x_config.max < config->x_config.min) {
-        uint8_t temp         = config->x_config.max;
-        config->x_config.max = config->x_config.min;
-        config->x_config.min = temp;
-    }
-    if (config->y_config.max < config->y_config.min) {
-        uint8_t temp         = config->y_config.max;
-        config->y_config.max = config->y_config.min;
-        config->y_config.min = temp;
-    }
-
-    printf("\r\n--- Calibration complete ---\r\n");
-    printf("Joystick X: %u/%u/%u\r\n", config->x_config.min, config->x_config.center, config->x_config.max);
-    printf("Joystick Y: %u/%u/%u\r\n", config->y_config.min, config->y_config.center, config->y_config.max);
-    _delay_ms(CALIBRATION_DELAY);
-    config->calibrated = true;
+bool joystick_is_calibrated(void) {
+    // Check if joystick is calibrated
+    return joystick_calibration_config.calibrated;
 }
 
 /**
@@ -114,8 +72,15 @@ void joystick_calibrate(joystick_config_t *config) {
  * @param prev_dir The direction of the joystick from the previous read. Used for detecting if the joystick position changed.
  * @return joystick_t
  */
-joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
+joystick_t joystick_read(void) {
+    joystick_config_t *config = &joystick_calibration_config;
+
     joystick_t position = joystick_read_raw();
+    if (!config->calibrated) {
+        return position;
+    }
+
+    // Adjust joystick values
     int8_t     x_adjusted = joystick_adjust(position.raw_x, config->x_config);
     int8_t     y_adjusted = joystick_adjust(position.raw_y, config->y_config);
 
@@ -123,6 +88,7 @@ joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
     if (pow(x_adjusted, 2) < pow(JOY_DEADZONE_X, 2)) {
         x_adjusted = 0;
     }
+    // Y-deadzone
     if (pow(y_adjusted, 2) < pow(JOY_DEADZONE_Y, 2)) {
         y_adjusted = 0;
     }
@@ -132,16 +98,16 @@ joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
 
     // clang-format off
     if (pow(position.x, 2) > pow(position.y, 2)) {
-        if (position.x > 0) position.dir = JOYSTICK_RIGHT;
-        else                position.dir = JOYSTICK_LEFT;
+        if (position.x > 0) position.current_dir = JOYSTICK_RIGHT;
+        else                position.current_dir = JOYSTICK_LEFT;
     } else {
-        if (position.y > 0) position.dir = JOYSTICK_UP;
-        else                position.dir = JOYSTICK_DOWN;
+        if (position.y > 0) position.current_dir = JOYSTICK_UP;
+        else                position.current_dir = JOYSTICK_DOWN;
     }
-    if (position.x == 0 && position.y == 0) position.dir = JOYSTICK_CENTER;
+    if (position.x == 0 && position.y == 0) position.current_dir = JOYSTICK_CENTER;
     // clang-format on
 
-    position.dir_changed = prev_dir != position.dir;
+    // position.dir_changed = prev_dir != position.dir;
 
     return position;
 }
@@ -154,16 +120,20 @@ joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir) {
 joystick_t joystick_read_raw(void) {
     uint32_t   adc_output     = adc_read() >> (2 * 8);
     // uint16_t   joystick_raw   = adc_output & 0xFFFF;
+    // clang-format off
     joystick_t position = {
-      .x           = 0,
-      .y           = 0,
-      .dir         = JOYSTICK_CENTER,
-      .dir_changed = false,
-      .raw_x       = adc_output & 0xFF,
-      .raw_y       = (adc_output >> 8) & 0xFF,
+      .x = 0,
+      .y = 0,
+      .raw_x = adc_output & 0xFF,
+      .raw_y = (adc_output >> 8) & 0xFF,
+      .current_dir = JOYSTICK_CENTER,
+      //   .previous_dir = JOYSTICK_CENTER,
     };
+    // clang-format on
     return position;
 }
+
+joystick_config_t *joystick_get_config(void) { return &joystick_calibration_config; }
 
 /**
  * @brief Adjust joystick readings according to calibration

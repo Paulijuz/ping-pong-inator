@@ -21,6 +21,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/*****************************************************************************/
+/* Defines, typedefs                                                         */
+/*****************************************************************************/
+
 /**
  * @brief Joystick calibration values
  *
@@ -46,7 +50,11 @@
  * @brief Enum for joystick initialization state
  *
  */
-typedef enum JOYSTICK_INITIALIZATION_STATE { JOYSTICK_NO_CALIBRATE, JOYSTICK_USE_DEFAULT_CALIBRATION, JOYSTICK_CALIBRATE } e_JOYSTICK_INITIALIZATION_STATE;
+typedef enum JOYSTICK_INITIALIZATION_STATE {
+    JOYSTICK_ASSUME_IDEAL,
+    JOYSTICK_USE_DEFAULT_CALIBRATION,
+    JOYSTICK_CALIBRATE
+} e_JOYSTICK_INITIALIZATION_STATE;
 
 // clang-format off
 /**
@@ -92,19 +100,23 @@ typedef struct joystick_s {
     int8_t         x;
     int8_t         y;
 
-    e_JOYSTICK_DIR dir;
-    bool           dir_changed;
+    e_JOYSTICK_DIR current_dir;
+    // e_JOYSTICK_DIR previous_dir;
 
     uint8_t        raw_x;
     uint8_t        raw_y;
 } joystick_t;
 
-void       joystick_init(joystick_config_t *config, e_JOYSTICK_INITIALIZATION_STATE state);
-void       joystick_calibrate(joystick_config_t *config);
-joystick_t joystick_read(joystick_config_t *config, e_JOYSTICK_DIR prev_dir);
-joystick_t joystick_read_raw(void);
-int8_t     joystick_adjust(uint8_t value, joystick_config_axis_t axis_config);
+/*****************************************************************************/
+/* Public API                                                                */
+/*****************************************************************************/
 
-int8_t     map_int8(uint8_t val, uint8_t in_min, uint8_t in_max, int8_t out_min, int8_t out_max);
+void               joystick_init(e_JOYSTICK_INITIALIZATION_STATE state);
+void               joystick_calibrate(void);
+void               joystick_calibrate_axis(e_JOYSTICK_DIR axis);
+bool               joystick_is_calibrated(void);
+joystick_t         joystick_read(void);
+joystick_t         joystick_read_raw(void);
+joystick_config_t *joystick_get_config(void);
 
 #endif // JOYSTICK_H
