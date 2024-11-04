@@ -10,6 +10,7 @@
 #include "servo.h"
 #include "ir.h"
 #include "timer_counter.h"
+#include "solenoid.h"
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 // #include "uart.h"
@@ -40,6 +41,8 @@ int main() {
         printf("CAN initialization successful\n\r");
     }
 
+    solenoid_init();
+
     int i = 0;
     bool prev_hit = false;
     while (1) {
@@ -69,6 +72,7 @@ int main() {
         }
 
         prev_hit = hit;
-        time_spinFor(msecs(10));
+        time_spinFor(msecs(1000));
+        solenoid_fire();
     }
 }
