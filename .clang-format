@@ -29,6 +29,7 @@ SortIncludes: false
 
 # Merging onto a single line
 AllowShortEnumsOnASingleLine: false # https://clang.llvm.org/docs/ClangFormatStyleOptions.html#allowshortblocksonasingleline
+AllowShortFunctionsOnASingleLine: None # https://clang.llvm.org/docs/ClangFormatStyleOptions.html#allowshortfunctionsonasingleline
 
 # [cpp]
 PackConstructorInitializers: Never
