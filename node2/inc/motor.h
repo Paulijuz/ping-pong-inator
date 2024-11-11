@@ -14,5 +14,7 @@
 
 void motor_init();
 void motor_set_speed(float speed);
+void motor_set_position(float position);
+void motor_set_initial(int position);
 
 #endif // MOTOR_H

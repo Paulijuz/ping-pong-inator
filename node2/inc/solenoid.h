@@ -16,7 +16,6 @@
 #include "time.h"
 
 void solenoid_init(void);
-
 void solenoid_fire(void);
 
 #endif // SOLENOID_H

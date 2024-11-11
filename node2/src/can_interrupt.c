@@ -17,7 +17,7 @@
 #include "motor.h"
 #include "servo.h"
 
-#define DEBUG_RX_INTERRUPT 1
+#define DEBUG_RX_INTERRUPT 0
 #define DEBUG_TX_INTERRUPT 0
 #define DEBUG_BUS_ERROR    0
 
@@ -67,27 +67,26 @@ void CAN0_Handler(void) {
                 log_warning("CAN0 message too long, id: %d", message.id);
             }
 
-            int8_t data[message.data_length];
-            for (int i = 0; i < message.data_length; i++) {
-                data[i] = *((int8_t *)&message.data[i]);
-            }
-            log_debug("CAN0 message received. ID: %d, Data: %s", message.id, data);
-            // printf("ID: %d -> ", message.id);
-            // // printf("%d -> ", message.data_length);
-            // if (message.data_length > 2) {
-            //     printf("message too long, id: %d\n\r", message.id);
-            // }
+            // int8_t data[message.data_length];
             // for (int i = 0; i < message.data_length; i++) {
-            //     printf("%d ", *((int8_t *)&message.data[i]));
+            //     data[i] = *((int8_t *)&message.data[i]);
             // }
-            // printf("\n\r");
+            // log_debug("CAN0 message received. ID: %d, Data: %s", message.id, data);
+
+            printf("ID: %d -> ", message.id);
+            for (int i = 0; i < message.data_length; i++) {
+                printf("%d ", *((int8_t *)&message.data[i]));
+            }
+            printf("\n\r");
         }
 
         for (int i = 0; i < CAN_HANDLER_BUFFER_SIZE; i++) {
-            if (message.id != can_handler_buffer[i].id || !can_handler_buffer[i].handler)
+            if (message.id != can_handler_buffer[i].id || can_handler_buffer[i].handler == NULL)
                 continue;
 
             can_handler_buffer[i].handler(&message);
+            // log_debug("Handler for message ID %d called", message.id);
+            break;
         }
     }
 
@@ -124,11 +123,14 @@ void CAN0_Handler(void) {
 
 int can_register_handler(int id, void (*handler)(CAN_MESSAGE *)) {
     for (int i = 0; i < CAN_HANDLER_BUFFER_SIZE; i++) {
-        if (can_handler_buffer[i].handler)
+        // Skip entries which are already registered
+        if (can_handler_buffer[i].handler) {
             continue;
+        }
 
         can_handler_buffer[i].id      = id;
         can_handler_buffer[i].handler = handler;
+        // log_debug("%p", can_handler_buffer[i].handler);
 
         return id;
     }

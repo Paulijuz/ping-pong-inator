@@ -75,12 +75,12 @@ int main(void) {
     can_init();
     log_info("CAN initialized");
 
-    // Reenable interrupts
-    sei();
-
     // Joystick calibration and configuration
     joystick_init(JOYSTICK_USE_DEFAULT_CALIBRATION);
     log_info("Joystick initialized");
+
+    // Reenable interrupts
+    sei();
 
     // Continuous operation
     while (1) {

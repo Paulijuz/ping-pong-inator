@@ -19,6 +19,7 @@
 /*****************************************************************************/
 
 #define CAN_ID_JOYSTICK 1000
+#define CAN_ID_BUTTON   500
 
 /**
  * @brief Struct for CAN message

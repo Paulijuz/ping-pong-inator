@@ -18,13 +18,17 @@
 // #include "uart.h"
 
 void solenoid_fire_handler(CAN_MESSAGE* message) {
+    // log_debug("Solenoid fire handler");
     solenoid_fire();
 }
 
 void motor_speed_handler(CAN_MESSAGE* message) {
-    float pos = *((int8_t *)&message->data[0]);
-    servo_set_pos((pos+128)/255);
-    motor_set_speed(pos/255);
+    // log_debug("Motor speed handler");
+    float pos_x = *((int8_t *)&message->data[0]);
+    float pos_y = *((int8_t *)&message->data[1]);
+    servo_set_pos((pos_y + 128) / 255);
+    // motor_set_speed(pos/255);
+    motor_set_position(pos_x / 128);
 }
 
 int main() {
@@ -34,7 +38,7 @@ int main() {
     WDT->WDT_MR = WDT_MR_WDDIS;
 
     // Initialize UART
-    uart_init(F_CPU, 9600);
+    uart_init(F_CPU, 115200);
     log_info("UART initialized");
     // printf("UART initialized\n\r");
 
@@ -55,8 +59,23 @@ int main() {
     solenoid_init();
     ir_init();
 
-    can_register_handler(500, solenoid_fire_handler);
-    can_register_handler(2000, motor_speed_handler);
+    int decoder_initial = decoder_pos();
+    motor_set_initial(decoder_initial);
+
+    int handler_status;
+    handler_status = can_register_handler(500, solenoid_fire_handler);
+    if (handler_status < 0) {
+        log_info("Failed to register solenoid handler");
+    } else {
+        log_info("Solenoid handler registered");
+    }
+
+    handler_status = can_register_handler(1000, motor_speed_handler);
+    if (handler_status < 0) {
+        log_info("Failed to register motor speed handler");
+    } else {
+        log_info("Motor speed handler registered");
+    }
 
     int i = 0;
     bool prev_hit = false;
