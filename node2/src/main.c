@@ -59,9 +59,6 @@ int main() {
     solenoid_init();
     ir_init();
 
-    int decoder_initial = decoder_pos();
-    motor_set_initial(decoder_initial);
-
     int handler_status;
     handler_status = can_register_handler(500, solenoid_fire_handler);
     if (handler_status < 0) {

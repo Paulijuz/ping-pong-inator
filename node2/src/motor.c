@@ -33,11 +33,6 @@ void motor_set_speed(float speed) {
     }
 }
 
-static offset = 0;
-void motor_set_initial(int position) {
-    // offset = position;
-}
-
 void motor_set_position(float position) {
     // static float error_prev = 0;
     static float error_curr = 0;
@@ -56,7 +51,7 @@ void motor_set_position(float position) {
     // uint64_t decoder_position = ((decoder_high << 32) & 0xFFFF0000) | decoder_low;
     // float    current_pos      = map_float(decoder_position, MOTOR_POS_MIN, MOTOR_POS_MAX, -1, 1);
 
-    int   decoder_low = decoder_pos() - offset;
+    int   decoder_low = decoder_pos();
     float current_pos = (decoder_low / MOTOR_POS_MAX - 0.5f) * 2;
     // float current_pos = map_float(decoder_low, MOTOR_POS_MIN, MOTOR_POS_MAX, -1, 1);
     // log_debug("Current pos: %f", current_pos);
