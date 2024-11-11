@@ -13,6 +13,7 @@
 #include "decoder.h"
 #include "solenoid.h"
 #include "logger.h"
+#include "controller.h"
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 // #include "uart.h"
@@ -28,7 +29,8 @@ void motor_speed_handler(CAN_MESSAGE *message) {
     float pos_y = *((int8_t *)&message->data[1]);
     servo_set_pos((pos_y + 128) / 255);
     // motor_set_speed(pos/255);
-    motor_set_position(pos_x / 128);
+    // motor_set_position(pos_x / 128);
+    controller_set_reference(pos_x / 128);
 }
 
 int main() {
@@ -58,6 +60,7 @@ int main() {
     decoder_init();
     solenoid_init();
     ir_init();
+    controller_init();
 
     int handler_status;
     handler_status = can_register_handler(500, solenoid_fire_handler);
@@ -78,6 +81,11 @@ int main() {
     bool prev_hit = false;
     while (1) {
         CAN0_Handler();
+
+        if (controller_should_execute()) {
+            // log_debug("Controller executing");
+            controller_execute();
+        }
 
         // Sending messages
         // static int can_id = 0;

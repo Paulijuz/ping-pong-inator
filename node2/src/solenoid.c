@@ -2,7 +2,6 @@
  * @file solenoid.c
  * @author Theodor Johansson, Paulius Juzenas & William Stensrud
  * @brief
- * @version 0.1
  * @date 2024-11-04
  *
  * @copyright Copyright (c) 2024
@@ -11,6 +10,7 @@
 
 #include "sam.h"
 #include "solenoid.h"
+#include "logger.h"
 
 #define SOLENOID_PIO PIOA
 #define SOLENOID_PIN PIO_PA16
@@ -53,12 +53,13 @@ void solenoid_init(void) {
 
 void solenoid_fire(void) {
     if (solenoid_state != SOLENOID_READY) {
+        // log_info("Solenoid not ready to fire");
         return;
     }
 
     solenoid_state = SOLENOID_FIRED;
 
-    printf("Solenoid fired!\r\n");
+    // log_info("Solenoid fired!");
 
     SOLENOID_PIO->PIO_CODR    = SOLENOID_PIN; // Set low to enable solenoid relay
     
@@ -67,8 +68,8 @@ void solenoid_fire(void) {
 }
 
 static void solenoid_unfire() {
-    printf("Solenoid unfired!\r\n");
-    
+    // log_info("Solenoid unfired!");
+
     solenoid_state = SOLENOID_COOLDOWN;
 
     SOLENOID_PIO->PIO_SODR = SOLENOID_PIN; // Set high to disable solenoid relay
@@ -82,17 +83,17 @@ void TC0_Handler(void) {
 
     switch (solenoid_state) {
         case SOLENOID_READY:
-            printf("Solenoid should not be ready!\r\n");
+            log_info("Solenoid should not be ready!");
             break;
         case SOLENOID_FIRED:
             solenoid_unfire();
             break;
         case SOLENOID_COOLDOWN:
             solenoid_state = SOLENOID_READY;
-            printf("Solenoid ready!\r\n");
+            log_info("Solenoid ready!");
             break;
         default:
-            printf("This should no be possible...\r\n");
+            log_warning("This should no be possible...");
             break;
     }
 }

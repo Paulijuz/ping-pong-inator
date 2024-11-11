@@ -17,7 +17,7 @@
 #include "motor.h"
 #include "servo.h"
 
-#define DEBUG_RX_INTERRUPT 0
+#define DEBUG_RX_INTERRUPT 1
 #define DEBUG_TX_INTERRUPT 0
 #define DEBUG_BUS_ERROR    0
 
@@ -73,11 +73,11 @@ void CAN0_Handler(void) {
             // }
             // log_debug("CAN0 message received. ID: %d, Data: %s", message.id, data);
 
-            printf("ID: %d -> ", message.id);
-            for (int i = 0; i < message.data_length; i++) {
-                printf("%d ", *((int8_t *)&message.data[i]));
-            }
-            printf("\n\r");
+            // printf("ID: %d -> ", message.id);
+            // for (int i = 0; i < message.data_length; i++) {
+            //     printf("%d ", *((int8_t *)&message.data[i]));
+            // }
+            // printf("\n\r");
         }
 
         for (int i = 0; i < CAN_HANDLER_BUFFER_SIZE; i++) {
