@@ -179,6 +179,16 @@ void fsm_game(void) {
     // Read joystick
     joystick_t joystick = joystick_read();
 
+    // Transmit virtual button
+    if (button_right_pressed()) {
+        can_message_s t_message = {
+          .data   = {1},
+          .length = 1,
+          .id     = CAN_ID_BUTTON,
+        };
+        can_transmit(&t_message);
+    }
+
     // Transmit CAN message
     can_message_s t_message = {
       .data   = {joystick.x, joystick.y},
