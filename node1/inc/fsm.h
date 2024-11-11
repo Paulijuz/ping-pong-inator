@@ -66,5 +66,6 @@ void        fsm_set_state(e_FSM_STATE state);
 void        fsm_goto_game(void);
 void        fsm_goto_menu(void);
 void        fsm_goto_calibration(void);
+void        fsm_goto_game_over(void);
 
 #endif // FSM_H

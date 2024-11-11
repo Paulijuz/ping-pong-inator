@@ -41,6 +41,10 @@ static e_FSM_STATE current_state = FSM_MENU;
 // Previously read input direction
 static e_JOYSTICK_DIR joystick_previous_dir = JOYSTICK_CENTER;
 
+// Game state
+#define MAX_LIVES 3
+static uint8_t lives = MAX_LIVES;
+
 /*****************************************************************************/
 /* Function definitions                                                      */
 /*****************************************************************************/
@@ -176,6 +180,9 @@ void fsm_calibration(void) {
  *
  */
 void fsm_game(void) {
+    static int8_t joystick_x_prev = 0;
+    static int8_t joystick_y_prev = 0;
+
     // Read joystick
     joystick_t joystick = joystick_read();
 
@@ -187,22 +194,44 @@ void fsm_game(void) {
           .id     = CAN_ID_BUTTON,
         };
         can_transmit(&t_message);
+        log_debug("Transmitted CAN message: %u: %s", t_message.id, t_message.data);
     }
 
     // Transmit CAN message
-    can_message_s t_message = {
-      .data   = {joystick.x, joystick.y},
-      .length = 2,
-      .id     = CAN_ID_JOYSTICK,
-    };
-    can_transmit(&t_message);
+    if (joystick.x != joystick_x_prev || joystick.y != joystick_y_prev) {
+        // log_debug("Joystick: %d, %d", joystick.x, joystick.y);
+        joystick_x_prev = joystick.x;
+        joystick_y_prev = joystick.y;
+
+        can_message_s t_message = {
+          .data   = {joystick.x, joystick.y},
+          .length = 2,
+          .id     = CAN_ID_JOYSTICK,
+        };
+        can_transmit(&t_message);
+    }
 
     // Receive CAN message
     can_message_s r_message;
     bool          can_receive_status = can_receive(&r_message); // Should this use mailboxes or interrupts?
     if (can_receive_status) {
         log_debug("Received CAN message: %u: %s", r_message.id, r_message.data);
+        switch (r_message.id) {
+        case CAN_ID_IR:
+            if (r_message.data[0] >= lives) {
+                fsm_goto_game_over();
+            } else {
+                lives -= r_message.data[0];
+            }
+            break;
+        default:
+            log_warning("Unknown CAN message ID: %u", r_message.id);
+            break;
+        }
     }
+
+    // Draw game
+    menu_draw_game(lives, MAX_LIVES);
 }
 
 /**
@@ -210,7 +239,14 @@ void fsm_game(void) {
  *
  */
 void fsm_game_over(void) {
-    // Pass
+    // Get button
+    bool button_right = button_right_pressed();
+    if (button_right) {
+        fsm_goto_menu();
+    }
+
+    // Draw game over
+    menu_draw_game_over();
 }
 
 /**
@@ -236,3 +272,6 @@ void fsm_set_state(e_FSM_STATE state) {
 void fsm_goto_game(void) { fsm_set_state(FSM_GAME); }
 void fsm_goto_menu(void) { fsm_set_state(FSM_MENU); }
 void fsm_goto_calibration(void) { fsm_set_state(FSM_CALIBRATION); }
+void fsm_goto_game_over(void) {
+    fsm_set_state(FSM_GAME_OVER);
+}

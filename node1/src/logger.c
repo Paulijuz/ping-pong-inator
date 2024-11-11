@@ -37,7 +37,7 @@
 #define FATAL     4
 #define NO_LOG    5
 
-#define LOG_LEVEL INFO // The current log level
+#define LOG_LEVEL DEBUG // The current log level
 
 /**
  * @brief Logging debug messages

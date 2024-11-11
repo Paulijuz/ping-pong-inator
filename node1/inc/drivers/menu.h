@@ -53,5 +53,7 @@ void           menu_activate_selection(void);
 
 // Specific menu functions for drawing certain pages
 void menu_draw_calibration(const char *direction, float completion);
+void menu_draw_game(const uint8_t lives, const uint8_t max_lives);
+void menu_draw_game_over(void);
 
 #endif

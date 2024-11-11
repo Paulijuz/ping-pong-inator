@@ -132,6 +132,29 @@ void menu_draw_calibration(const char *direction, float completion) {
     oled_print_string("%");
 }
 
+void menu_draw_game(const uint8_t lives, const uint8_t max_lives) {
+    oled_goto_line(2);
+    oled_goto_column(16);
+    oled_print_string("GAME");
+
+    oled_goto_line(4);
+    oled_goto_column(16);
+    oled_print_string("Lives: ");
+    oled_print_char((char)lives);
+    oled_print_string(" / ");
+    oled_print_char((char)max_lives);
+}
+
+void menu_draw_game_over(void) {
+    oled_goto_line(2);
+    oled_goto_column(16);
+    oled_print_string("GAME OVER");
+
+    oled_goto_line(4);
+    oled_goto_column(16);
+    oled_print_string("Press right button");
+}
+
 /**
  * @brief
  *
