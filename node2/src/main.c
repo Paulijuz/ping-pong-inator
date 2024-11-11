@@ -12,6 +12,7 @@
 #include "ir.h"
 #include "decoder.h"
 #include "solenoid.h"
+#include "logger.h"
 
 // Import UART from Node 2 starter code, then edit include path accordingly. Also, remember to update the makefile
 // #include "uart.h"
@@ -34,15 +35,18 @@ int main() {
 
     // Initialize UART
     uart_init(F_CPU, 9600);
-    printf("UART initialized\n\r");
+    log_info("UART initialized");
+    // printf("UART initialized\n\r");
 
     // Initialize CAN
     uint32_t can_br = 0x01293165; // This was calculated by hand
     uint8_t  status = can_init_default_tx_rx_mb(can_br);
     if (status) {
-        printf("CAN initialization failed\n\r");
+        log_info("CAN initialization failed");
+        // printf("CAN initialization failed\n\r");
     } else {
-        printf("CAN initialization successful\n\r");
+        log_info("CAN initialization successful");
+        // printf("CAN initialization successful\n\r");
     }
 
     servo_init();
@@ -79,7 +83,8 @@ int main() {
         
         if (!prev_hit && hit) {
             i++;
-            printf("IR hit count: %d\r\n", i);
+            log_debug("IR hit count: %d", i);
+            // printf("IR hit count: %d\r\n", i);
         }
 
         prev_hit = hit;

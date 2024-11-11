@@ -13,6 +13,9 @@
 #include "sam.h"
 #include "can_interrupt.h"
 #include "can_controller.h"
+#include "logger.h"
+#include "motor.h"
+#include "servo.h"
 
 #define DEBUG_RX_INTERRUPT 1
 #define DEBUG_TX_INTERRUPT 0
@@ -45,34 +48,44 @@ void CAN0_Handler(void) {
 
         // Check which mailbox received the message
         if (can_sr & CAN_SR_MB1) {
-            status |= can_receive(&message, 1);                     // Mailbox 1 event
+            status |= can_receive(&message, 1);                      // Mailbox 1 event
         } else if (can_sr & CAN_SR_MB2) {
-            status |= can_receive(&message, 2);                     // Mailbox 2 event
+            status |= can_receive(&message, 2);                      // Mailbox 2 event
         } else {
-            printf("CAN0 message arrived in non-used mailbox\n\r"); // Incorrect event
+            log_warning("CAN0 message arrived in non-used mailbox"); // Incorrect event
         }
 
         // Check error status
         if (status != 0) {
             // Somehow faster CAN messages prevent mailbox busy errors??
-            printf("CAN0 Mailboxes busy\n\r");
+            log_warning("CAN0 mailboxes busy"); // Incorrect event
             return;
         }
 
         if (DEBUG_RX_INTERRUPT) {
-            printf("ID: %d -> ", message.id);
-            // printf("%d -> ", message.data_length);
             if (message.data_length > 2) {
-                printf("message too long, id: %d\n\r", message.id);
+                log_warning("CAN0 message too long, id: %d", message.id);
             }
+
+            int8_t data[message.data_length];
             for (int i = 0; i < message.data_length; i++) {
-                printf("%d ", *((int8_t *)&message.data[i]));
+                data[i] = *((int8_t *)&message.data[i]);
             }
-            printf("\n\r");
+            log_debug("CAN0 message received. ID: %d, Data: %s", message.id, data);
+            // printf("ID: %d -> ", message.id);
+            // // printf("%d -> ", message.data_length);
+            // if (message.data_length > 2) {
+            //     printf("message too long, id: %d\n\r", message.id);
+            // }
+            // for (int i = 0; i < message.data_length; i++) {
+            //     printf("%d ", *((int8_t *)&message.data[i]));
+            // }
+            // printf("\n\r");
         }
 
         for (int i = 0; i < CAN_HANDLER_BUFFER_SIZE; i++) {
-            if (message.id != can_handler_buffer[i].id || !can_handler_buffer[i].handler) continue;
+            if (message.id != can_handler_buffer[i].id || !can_handler_buffer[i].handler)
+                continue;
 
             can_handler_buffer[i].handler(&message);
         }
@@ -80,7 +93,8 @@ void CAN0_Handler(void) {
 
     if (can_sr & CAN_SR_MB0) {
         if (DEBUG_TX_INTERRUPT) {
-            printf("CAN0 MB0 ready to send \n\r");
+            log_debug("CAN0 mailbox 0 ready to send");
+            // printf("CAN0 MB0 ready to send \n\r");
         }
 
         // Disable interrupt
@@ -89,12 +103,14 @@ void CAN0_Handler(void) {
 
     if (can_sr & CAN_SR_ERRP) {
         if (DEBUG_BUS_ERROR) {
-            printf("CAN0 ERRP error\n\r");
+            log_error("CAN0 ERRP error");
+            // printf("CAN0 ERRP error\n\r");
         }
     }
     if (can_sr & CAN_SR_TOVF) {
         if (DEBUG_BUS_ERROR) {
-            printf("CAN0 timer overflow\n\r");
+            log_error("CAN0 timer overflow");
+            // printf("CAN0 timer overflow\n\r");
         }
     }
 
@@ -106,10 +122,11 @@ void CAN0_Handler(void) {
     // NVIC_EnableIRQ(ID_CAN0);
 }
 
-int can_register_handler(int id, void (*handler)(CAN_MESSAGE*)) {
+int can_register_handler(int id, void (*handler)(CAN_MESSAGE *)) {
     for (int i = 0; i < CAN_HANDLER_BUFFER_SIZE; i++) {
-        if (can_handler_buffer[i].handler) continue;
-        
+        if (can_handler_buffer[i].handler)
+            continue;
+
         can_handler_buffer[i].id      = id;
         can_handler_buffer[i].handler = handler;
 
