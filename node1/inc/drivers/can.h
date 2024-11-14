@@ -18,9 +18,9 @@
 /* Typedefs                                                                  */
 /*****************************************************************************/
 
-#define CAN_ID_IR       1500
 #define CAN_ID_JOYSTICK 1000
 #define CAN_ID_BUTTON   500
+#define CAN_ID_IR       250
 
 /**
  * @brief Struct for CAN message

@@ -53,31 +53,31 @@ int main(void) {
 
     // Initialize SRAM
     sram_init();
-    log_info("SRAM initialized");
+    // log_info("SRAM initialized");
 
     // Initialize ADC
     adc_init();
-    log_info("ADC initialized");
+    // log_info("ADC initialized");
 
     // Initialize OLED
     oled_init();
-    log_info("OLED initialized");
+    // log_info("OLED initialized");
     font_config_t font_config = FONT5_CONFIG; // Decide on font
     oled_set_font(&font_config);
-    log_info("Font set");
+    // log_info("Font set");
     oled_clear_screen();
 
     // Initialize SPI
     spi_init_master();
-    log_info("SPI initialized");
+    // log_info("SPI initialized");
 
     // Initialize CAN
     can_init();
-    log_info("CAN initialized");
+    // log_info("CAN initialized");
 
     // Joystick calibration and configuration
     joystick_init(JOYSTICK_USE_DEFAULT_CALIBRATION);
-    log_info("Joystick initialized");
+    // log_info("Joystick initialized");
 
     // Reenable interrupts
     sei();

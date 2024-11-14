@@ -163,9 +163,9 @@ void fsm_calibration(void) {
             config->calibrated = true;
             current_axis       = 0;
 
-            log_info("Joystick calibrated");
-            log_info("Joystick X: %u/%u/%u", config->x_config.min, config->x_config.center, config->x_config.max);
-            log_info("Joystick Y: %u/%u/%u", config->y_config.min, config->y_config.center, config->y_config.max);
+            // log_info("Joystick calibrated");
+            // log_info("Joystick X: %u/%u/%u", config->x_config.min, config->x_config.center, config->x_config.max);
+            // log_info("Joystick Y: %u/%u/%u", config->y_config.min, config->y_config.center, config->y_config.max);
 
             fsm_goto_menu();
         }
@@ -194,7 +194,7 @@ void fsm_game(void) {
           .id     = CAN_ID_BUTTON,
         };
         can_transmit(&t_message);
-        log_debug("Transmitted CAN message: %u: %s", t_message.id, t_message.data);
+        // log_debug("Transmitted CAN message: %u: %s", t_message.id, t_message.data);
     }
 
     // Transmit CAN message
@@ -215,7 +215,7 @@ void fsm_game(void) {
     can_message_s r_message;
     bool          can_receive_status = can_receive(&r_message); // Should this use mailboxes or interrupts?
     if (can_receive_status) {
-        log_debug("Received CAN message: %u: %s", r_message.id, r_message.data);
+        log_debug("Received CAN message: %u", r_message.id);
         switch (r_message.id) {
         case CAN_ID_IR:
             if (r_message.data[0] >= lives) {
@@ -240,7 +240,7 @@ void fsm_game(void) {
  */
 void fsm_game_over(void) {
     // Get button
-    bool button_right = button_right_pressed();
+    bool button_right = button_left_pressed();
     if (button_right) {
         fsm_goto_menu();
     }
@@ -269,7 +269,10 @@ void fsm_set_state(e_FSM_STATE state) {
     current_state = state;
 }
 
-void fsm_goto_game(void) { fsm_set_state(FSM_GAME); }
+void fsm_goto_game(void) {
+    lives = MAX_LIVES;
+    fsm_set_state(FSM_GAME);
+}
 void fsm_goto_menu(void) { fsm_set_state(FSM_MENU); }
 void fsm_goto_calibration(void) { fsm_set_state(FSM_CALIBRATION); }
 void fsm_goto_game_over(void) {

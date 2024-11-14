@@ -140,9 +140,9 @@ void menu_draw_game(const uint8_t lives, const uint8_t max_lives) {
     oled_goto_line(4);
     oled_goto_column(16);
     oled_print_string("Lives: ");
-    oled_print_char((char)lives);
+    oled_print_char((char)(lives + '0'));
     oled_print_string(" / ");
-    oled_print_char((char)max_lives);
+    oled_print_char((char)(max_lives + '0'));
 }
 
 void menu_draw_game_over(void) {
@@ -152,7 +152,7 @@ void menu_draw_game_over(void) {
 
     oled_goto_line(4);
     oled_goto_column(16);
-    oled_print_string("Press right button");
+    oled_print_string("Press left button");
 }
 
 /**
