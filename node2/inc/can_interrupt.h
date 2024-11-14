@@ -16,6 +16,10 @@
 
 #define CAN_HANDLER_BUFFER_SIZE 20
 
+#define CAN_ID_JOYSTICK         1000
+#define CAN_ID_BUTTON           500
+#define CAN_ID_IR               250
+
 typedef struct can_handler_buffer_entry_s {
     int id;
     void (*handler)(CAN_MESSAGE*);

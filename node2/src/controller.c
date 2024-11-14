@@ -61,28 +61,47 @@ float controller_get_reference(void) {
 }
 
 void controller_execute(void) {
+    static float error_curr = 0;
+    static float error_prev = 0;
     static float error_sum = 0;
+    static float reference  = 0;
     // static float error_prev = 0;
 
-    float reference = controller_get_reference();
-
+    float delta_reference = controller_get_reference();
     // Error check on input
-    if (reference > 1 || reference < -1) {
-        log_warning("Reference out of bounds: %f", reference);
+    if (delta_reference > 1 || delta_reference < -1) {
+        log_warning("Reference out of bounds: %f", delta_reference);
         return;
+    }
+
+    reference += 3 * delta_reference * CONTROLLER_INTERVAL_MS / 1000;
+    if (reference > 1) {
+        reference = 1;
+    } else if (reference < -1) {
+        reference = -1;
     }
 
     int   decoder_low = decoder_pos();
     float current_pos = (decoder_low / MOTOR_POS_MAX - 0.5f) * 2;
 
-    float error_curr = reference - current_pos;
+    error_prev = error_curr;
+    error_curr = reference - current_pos;
     error_sum += error_curr;
 
-    float input = KP * error_curr + (1.0f / CONTROLLER_INTERVAL_MS) * KI * error_sum;
+    // clang-format off
+    float input = KP * error_curr \
+        + CONTROLLER_INTERVAL_MS / 1000.0f * KI * error_sum \
+        + KD * (error_curr - error_prev) / (CONTROLLER_INTERVAL_MS / 1000.0f);
+    // clang-format on
     if (input > 1) {
         input = 1;
     } else if (input < -1) {
         input = -1;
+    }
+
+    float margin = 0.01;
+    if (input < margin && input > -margin) {
+        input = 0;
     }
     // log_debug("Pos, Decoder, Integrator, Input: %f, %d, %f, %f", current_pos, decoder_low, error_sum, input);
     // log_debug("Input: %f", input);

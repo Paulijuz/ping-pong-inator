@@ -12,6 +12,9 @@
 #ifndef SERVO_H
 #define SERVO_H
 
+#include "pwm.h"
+#include "logger.h"
+
 #define PWM_DUTY_MIN 0.9/20.0f
 #define PWM_DUTY_MAX 2.1/20.0f
 

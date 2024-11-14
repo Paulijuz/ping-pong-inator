@@ -14,8 +14,10 @@
 #define IR_H
 
 #include <stdbool.h>
+#include "logger.h"
 
-#define IR_HIT_THREASHOLD 1024
+#define IR_HIT_THREASHOLD  500
+#define IR_RESET_THRESHOLD 3000
 #define IR_HIT_COUNT_MAX 5
 
 void ir_init();

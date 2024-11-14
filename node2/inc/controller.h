@@ -22,9 +22,10 @@
 
 #define MOTOR_POS_MAX          2808.0f
 #define MOTOR_POS_MIN          0
-#define KP                     0.6
-#define KI                     1.5
-#define T                      0.01
+#define KP                     1.5f
+#define KI                     0.05f
+#define KD                     0.1f
+// #define T                      0.01
 
 #define CONTROLLER_INTERVAL_MS 100
 

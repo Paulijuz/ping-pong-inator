@@ -27,9 +27,8 @@ void motor_speed_handler(CAN_MESSAGE *message) {
     // log_debug("Motor speed handler");
     float pos_x = *((int8_t *)&message->data[0]);
     float pos_y = *((int8_t *)&message->data[1]);
+
     servo_set_pos((pos_y + 128) / 255);
-    // motor_set_speed(pos/255);
-    // motor_set_position(pos_x / 128);
     controller_set_reference(pos_x / 128);
 }
 
@@ -63,21 +62,21 @@ int main() {
     controller_init();
 
     int handler_status;
-    handler_status = can_register_handler(500, solenoid_fire_handler);
+    handler_status = can_register_handler(CAN_ID_BUTTON, solenoid_fire_handler);
     if (handler_status < 0) {
         log_info("Failed to register solenoid handler");
     } else {
         log_info("Solenoid handler registered");
     }
 
-    handler_status = can_register_handler(1000, motor_speed_handler);
+    handler_status = can_register_handler(CAN_ID_JOYSTICK, motor_speed_handler);
     if (handler_status < 0) {
         log_info("Failed to register motor speed handler");
     } else {
         log_info("Motor speed handler registered");
     }
 
-    int  i        = 0;
+    // int  i        = 0;
     bool prev_hit = false;
     while (1) {
         CAN0_Handler();
@@ -87,30 +86,23 @@ int main() {
             controller_execute();
         }
 
-        // Sending messages
-        // static int can_id = 0;
-        // CAN_MESSAGE can_msg = {
-        //   .id          = can_id++,
-        //   .data_length = 6,
-        //   .data        = "world!"
-        // };
-        // can_send(&can_msg, 0);
-        // time_spinFor(msecs(1));
-
-        //   servo_set_pos((i%100)/100.0f);
-        // read_encoder();
-        // printf("Motor pos: %d \r\n", tc_read_motor_pos());
-        // printf("Motor revolutions: %d \r\n", tc_read_motor_rev());
-        // tc_read_status();
         bool hit = ir_hit();
-
         if (!prev_hit && hit) {
-            i++;
-            log_debug("IR hit count: %d", i);
-            // printf("IR hit count: %d\r\n", i);
+            // i++;
+            // log_debug("IR hit count: %d", i);
+            CAN_MESSAGE message = {
+              .id = CAN_ID_IR, .data_length = 1, .data = {hit}, // Number of hits
+            };
+            uint8_t status = can_send(&message, 0);
+            if (status) {
+                log_info("Failed to send IR hit count");
+            } else {
+                log_info("IR hit count sent");
+            }
         }
-
         prev_hit = hit;
+
+        // Wait
         time_spinFor(msecs(10));
     }
 }

@@ -21,6 +21,7 @@ void motor_init() {
 
 void motor_set_speed(float speed) {
     if (speed > 1 || speed < -1) {
+        log_warning("Motor speed out of bounds: %f", speed);
         return;
     }
 

@@ -9,8 +9,6 @@
  * 
  */
 
-
-#include "pwm.h"
 #include "servo.h"
 
 #define SERVO_PIN 13
@@ -22,7 +20,9 @@ void servo_init() {
 
 void servo_set_pos(float pos) {
     if (pos < 0 || pos > 1) {
+        log_warning("Servo position out of bounds: %f", pos);
         return;
     }
-    pwm_set_duty_cycle(PWM_DUTY_MIN + (PWM_DUTY_MAX-PWM_DUTY_MIN)*pos, SERVO_CHANNEL);
+
+    pwm_set_duty_cycle(PWM_DUTY_MIN + (PWM_DUTY_MAX - PWM_DUTY_MIN) * pos, SERVO_CHANNEL);
 }
