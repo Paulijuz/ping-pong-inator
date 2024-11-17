@@ -1,1 +1,1 @@
-Welcome to the *Ping Pong-Inator*! This is the course work for the subject [TTK4155 - Embedded and Industrial Computer Systems Design](https://www.ntnu.edu/studies/courses/TTK4155), also simply known as "byggern", at NTNU.
+Welcome to *Ping Pong-Inator*! This is the course work for the subject [TTK4155 - Embedded and Industrial Computer Systems Design](https://www.ntnu.edu/studies/courses/TTK4155), also simply known as "byggern", at NTNU.
